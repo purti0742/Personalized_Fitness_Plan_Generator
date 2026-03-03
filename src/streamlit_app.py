@@ -20,9 +20,8 @@ bg_url = "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=form
 # -----------------------
 st.markdown(f"""
 <style>
-
 .stApp {{
-    background-image: linear-gradient(rgba(0,0,0,0.80), rgba(0,0,0,0.80)), 
+    background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), 
                       url("{bg_url}");
     background-size: cover;
     background-position: center;
@@ -30,14 +29,14 @@ st.markdown(f"""
 }}
 
 .block-container {{
-    padding-top: 0rem;
+    padding-top: 1rem;
 }}
 
 .card {{
     width: 500px;
-    margin: 100px auto;
+    margin: 80px auto;
     padding: 40px;
-    background: rgba(0, 0, 0, 0.70);
+    background: rgba(0, 0, 0, 0.75);
     border-radius: 12px;
     text-align: center;
     color: white;
@@ -49,8 +48,13 @@ st.markdown(f"""
     color: white;
     height: 45px;
     font-weight: bold;
+    border-radius: 6px;
 }}
 
+.stButton>button:hover {{
+    background-color: #ff1f2e;
+    color: white;
+}}
 </style>
 """, unsafe_allow_html=True)
 
@@ -119,6 +123,14 @@ elif st.session_state.page == "dashboard":
 
     st.title("💪 FitPlan AI - Personalized Fitness Plan Generator")
 
+    st.subheader("Enter Your Personal Details")
+
+    # Personal Details
+    name = st.text_input("Your Name")
+    age = st.number_input("Age", min_value=10, max_value=80)
+    height = st.number_input("Height (cm)", min_value=100, max_value=220)
+    weight = st.number_input("Weight (kg)", min_value=30, max_value=200)
+
     st.subheader("Enter Your Fitness Details")
 
     goal = st.selectbox(
@@ -138,27 +150,59 @@ elif st.session_state.page == "dashboard":
 
     if st.button("Generate Workout Plan"):
 
-        st.subheader("🏋️ Your Personalized Weekly Plan")
+        if not name:
+            st.error("Please enter your name")
+        else:
+            # BMI Calculation
+            height_m = height / 100
+            bmi = round(weight / (height_m ** 2), 2)
 
-        for day in range(1, 6):
-            st.markdown(f"### Day {day}")
-
-            if goal == "Build Muscle":
-                exercises = ["Push-ups", "Squats", "Bench Press", "Deadlifts", "Bicep Curls"]
-            elif goal == "Lose Weight":
-                exercises = ["Jumping Jacks", "Burpees", "Mountain Climbers", "High Knees"]
-            elif goal == "Improve Cardio":
-                exercises = ["Running", "Cycling", "Skipping", "Rowing"]
+            if bmi < 18.5:
+                bmi_status = "Underweight"
+            elif bmi < 24.9:
+                bmi_status = "Normal"
+            elif bmi < 29.9:
+                bmi_status = "Overweight"
             else:
-                exercises = ["Yoga Stretch", "Hamstring Stretch", "Shoulder Mobility"]
+                bmi_status = "Obese"
 
-            selected = random.sample(exercises, min(3, len(exercises)))
+            st.success(f"Hello {name}! Here is your personalized plan 💪")
+            st.write(f"**Your BMI:** {bmi} ({bmi_status})")
 
-            for ex in selected:
-                st.write(f"- {ex} – 3 sets x 12 reps")
+            # Personalization Logic
+            if weight > 85:
+                reps = "15 reps"
+            elif weight < 55:
+                reps = "10 reps"
+            else:
+                reps = "12 reps"
 
-            st.write("Rest: 60 seconds")
-            st.markdown("---")
+            if age > 50:
+                rest_time = "90 seconds"
+            else:
+                rest_time = "60 seconds"
+
+            st.subheader("🏋️ Your Personalized 5-Day Plan")
+
+            for day in range(1, 6):
+                st.markdown(f"### Day {day}")
+
+                if goal == "Build Muscle":
+                    exercises = ["Push-ups", "Squats", "Bench Press", "Deadlifts", "Bicep Curls"]
+                elif goal == "Lose Weight":
+                    exercises = ["Jumping Jacks", "Burpees", "Mountain Climbers", "High Knees"]
+                elif goal == "Improve Cardio":
+                    exercises = ["Running", "Cycling", "Skipping", "Rowing"]
+                else:
+                    exercises = ["Yoga Stretch", "Hamstring Stretch", "Shoulder Mobility"]
+
+                selected = random.sample(exercises, min(3, len(exercises)))
+
+                for ex in selected:
+                    st.write(f"- {ex} – 3 sets x {reps}")
+
+                st.write(f"Rest: {rest_time}")
+                st.markdown("---")
 
     if st.button("Logout"):
         st.session_state.page = "login"
