@@ -126,7 +126,7 @@ st.markdown('<div class="login-box">', unsafe_allow_html=True)
 # ================= LOGIN =================
 if st.session_state.page == "login":
 
-    st.markdown("<h2>PLEASE LOG IN</h2>", unsafe_allow_html=True)
+    st.markdown("<h2> LOG IN</h2>", unsafe_allow_html=True)
 
     email = st.text_input("Email Address")
     password = st.text_input("Password", type="password")
