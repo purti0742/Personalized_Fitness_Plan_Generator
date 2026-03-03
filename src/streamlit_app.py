@@ -1,10 +1,11 @@
 import streamlit as st
+import random
 
 # -----------------------
 # PAGE CONFIG
 # -----------------------
 st.set_page_config(
-    page_title="Fit Everywhere - Login",
+    page_title="FitPlan AI",
     page_icon="💪",
     layout="wide"
 )
@@ -21,7 +22,7 @@ st.markdown(f"""
 <style>
 
 .stApp {{
-    background-image: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)), 
+    background-image: linear-gradient(rgba(0,0,0,0.80), rgba(0,0,0,0.80)), 
                       url("{bg_url}");
     background-size: cover;
     background-position: center;
@@ -30,110 +31,50 @@ st.markdown(f"""
 
 .block-container {{
     padding-top: 0rem;
-    padding-bottom: 0rem;
 }}
 
-.navbar {{
-    display: flex;
-    justify-content: space-between;
-    padding: 20px 60px;
-    color: white;
-    font-weight: 600;
-    font-size: 18px;
-}}
-
-.nav-links a {{
-    color: white;
-    margin-left: 30px;
-    text-decoration: none;
-    font-size: 16px;
-}}
-
-.login-box {{
-    width: 420px;
+.card {{
+    width: 500px;
     margin: 100px auto;
-    padding: 45px;
-    background: rgba(0, 0, 0, 0.65);
+    padding: 40px;
+    background: rgba(0, 0, 0, 0.70);
     border-radius: 12px;
     text-align: center;
     color: white;
-    box-shadow: 0px 0px 25px rgba(0,0,0,0.8);
-}}
-
-.login-box h2 {{
-    margin-bottom: 30px;
-    letter-spacing: 1px;
-}}
-
-.stTextInput>div>div>input {{
-    background-color: transparent;
-    color: white;
-    border: 1px solid #aaa;
-    border-radius: 5px;
 }}
 
 .stButton>button {{
     width: 100%;
     background-color: #e50914;
     color: white;
-    border-radius: 6px;
     height: 45px;
-    font-size: 16px;
     font-weight: bold;
-    border: none;
-}}
-
-.stButton>button:hover {{
-    background-color: #ff1f2e;
-    color: white;
-}}
-
-.small-text {{
-    margin-top: 15px;
-    font-size: 14px;
-    color: #ccc;
-    cursor: pointer;
 }}
 
 </style>
 """, unsafe_allow_html=True)
 
 # -----------------------
-# NAVBAR
-# -----------------------
-st.markdown("""
-<div class="navbar">
-    <div>FIT EVERYWHERE</div>
-    <div class="nav-links">
-        <a href="#">Home</a>
-        <a href="#">My Progress</a>
-        <a href="#">Contact</a>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-# -----------------------
-# SESSION STATE FOR TOGGLE
+# SESSION STATE
 # -----------------------
 if "page" not in st.session_state:
     st.session_state.page = "login"
 
-# -----------------------
-# LOGIN / SIGNUP BOX
-# -----------------------
-st.markdown('<div class="login-box">', unsafe_allow_html=True)
-
-# ================= LOGIN =================
+# =====================================================
+# LOGIN PAGE
+# =====================================================
 if st.session_state.page == "login":
 
-    st.markdown("<h2> LOG IN</h2>", unsafe_allow_html=True)
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown("<h2>PLEASE LOG IN</h2>", unsafe_allow_html=True)
 
     email = st.text_input("Email Address")
     password = st.text_input("Password", type="password")
 
     if st.button("LOGIN"):
         if email and password:
-            st.success("Login Successful ✅")
+            st.session_state.page = "dashboard"
+            st.rerun()
         else:
             st.error("Please enter Email and Password")
 
@@ -141,9 +82,14 @@ if st.session_state.page == "login":
         st.session_state.page = "signup"
         st.rerun()
 
-# ================= SIGNUP =================
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# =====================================================
+# SIGNUP PAGE
+# =====================================================
 elif st.session_state.page == "signup":
 
+    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown("<h2>CREATE ACCOUNT</h2>", unsafe_allow_html=True)
 
     new_email = st.text_input("Email Address")
@@ -157,9 +103,63 @@ elif st.session_state.page == "signup":
             st.error("Passwords do not match")
         else:
             st.success("Account Created Successfully 🎉")
-    
+            st.session_state.page = "login"
+            st.rerun()
+
     if st.button("Already have an account? Login"):
         st.session_state.page = "login"
         st.rerun()
 
-st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# =====================================================
+# DASHBOARD – FITPLAN AI MODULE
+# =====================================================
+elif st.session_state.page == "dashboard":
+
+    st.title("💪 FitPlan AI - Personalized Fitness Plan Generator")
+
+    st.subheader("Enter Your Fitness Details")
+
+    goal = st.selectbox(
+        "Select Your Goal",
+        ["Build Muscle", "Lose Weight", "Improve Cardio", "Increase Flexibility"]
+    )
+
+    equipment = st.selectbox(
+        "Available Equipment",
+        ["No Equipment", "Dumbbells", "Gym Equipment", "Resistance Bands"]
+    )
+
+    level = st.selectbox(
+        "Fitness Level",
+        ["Beginner", "Intermediate", "Advanced"]
+    )
+
+    if st.button("Generate Workout Plan"):
+
+        st.subheader("🏋️ Your Personalized Weekly Plan")
+
+        for day in range(1, 6):
+            st.markdown(f"### Day {day}")
+
+            if goal == "Build Muscle":
+                exercises = ["Push-ups", "Squats", "Bench Press", "Deadlifts", "Bicep Curls"]
+            elif goal == "Lose Weight":
+                exercises = ["Jumping Jacks", "Burpees", "Mountain Climbers", "High Knees"]
+            elif goal == "Improve Cardio":
+                exercises = ["Running", "Cycling", "Skipping", "Rowing"]
+            else:
+                exercises = ["Yoga Stretch", "Hamstring Stretch", "Shoulder Mobility"]
+
+            selected = random.sample(exercises, min(3, len(exercises)))
+
+            for ex in selected:
+                st.write(f"- {ex} – 3 sets x 12 reps")
+
+            st.write("Rest: 60 seconds")
+            st.markdown("---")
+
+    if st.button("Logout"):
+        st.session_state.page = "login"
+        st.rerun()
