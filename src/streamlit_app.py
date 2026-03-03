@@ -1,40 +1,139 @@
-import altair as alt
-import numpy as np
-import pandas as pd
 import streamlit as st
 
-"""
-# Welcome to Streamlit!
+# -----------------------
+# PAGE CONFIG
+# -----------------------
+st.set_page_config(
+    page_title="Fit Everywhere - Login",
+    page_icon="💪",
+    layout="wide"
+)
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:.
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+# -----------------------
+# BACKGROUND IMAGE (Online URL)
+# -----------------------
+bg_url = "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1920&q=80"
 
-In the meantime, below is an example of what you can do with just a few lines of code:
-"""
+# -----------------------
+# CUSTOM CSS
+# -----------------------
+st.markdown(f"""
+<style>
 
-num_points = st.slider("Number of points in spiral", 1, 10000, 1100)
-num_turns = st.slider("Number of turns in spiral", 1, 300, 31)
+/* Full Page Background */
+.stApp {{
+    background-image: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)), 
+                      url("{bg_url}");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}}
 
-indices = np.linspace(0, 1, num_points)
-theta = 2 * np.pi * num_turns * indices
-radius = indices
+/* Remove default Streamlit padding */
+.block-container {{
+    padding-top: 0rem;
+    padding-bottom: 0rem;
+}}
 
-x = radius * np.cos(theta)
-y = radius * np.sin(theta)
+/* Navbar */
+.navbar {{
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 60px;
+    color: white;
+    font-weight: 600;
+    font-size: 18px;
+}}
 
-df = pd.DataFrame({
-    "x": x,
-    "y": y,
-    "idx": indices,
-    "rand": np.random.randn(num_points),
-})
+.nav-links a {{
+    color: white;
+    margin-left: 30px;
+    text-decoration: none;
+    font-size: 16px;
+}}
 
-st.altair_chart(alt.Chart(df, height=700, width=700)
-    .mark_point(filled=True)
-    .encode(
-        x=alt.X("x", axis=None),
-        y=alt.Y("y", axis=None),
-        color=alt.Color("idx", legend=None, scale=alt.Scale()),
-        size=alt.Size("rand", legend=None, scale=alt.Scale(range=[1, 150])),
-    ))
+/* Login Card */
+.login-box {{
+    width: 420px;
+    margin: 120px auto;
+    padding: 45px;
+    background: rgba(0, 0, 0, 0.65);
+    border-radius: 12px;
+    text-align: center;
+    color: white;
+    box-shadow: 0px 0px 25px rgba(0,0,0,0.8);
+}}
+
+.login-box h2 {{
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+}}
+
+/* Input Fields */
+.stTextInput>div>div>input {{
+    background-color: transparent;
+    color: white;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+}}
+
+/* Login Button */
+.stButton>button {{
+    width: 100%;
+    background-color: #e50914;
+    color: white;
+    border-radius: 6px;
+    height: 45px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+}}
+
+.stButton>button:hover {{
+    background-color: #ff1f2e;
+    color: white;
+}}
+
+/* Small Text */
+.small-text {{
+    margin-top: 15px;
+    font-size: 14px;
+    color: #ccc;
+}}
+
+</style>
+""", unsafe_allow_html=True)
+
+# -----------------------
+# NAVBAR
+# -----------------------
+st.markdown("""
+<div class="navbar">
+    <div>FIT EVERYWHERE</div>
+    <div class="nav-links">
+        <a href="#">Home</a>
+        <a href="#">My Progress</a>
+        <a href="#">Contact</a>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# -----------------------
+# LOGIN FORM
+# -----------------------
+st.markdown('<div class="login-box">', unsafe_allow_html=True)
+
+st.markdown("<h2>PLEASE LOG IN</h2>", unsafe_allow_html=True)
+
+email = st.text_input("Email Address")
+password = st.text_input("Password", type="password")
+
+if st.button("LOGIN"):
+    if email and password:
+        st.success("Login Successful ✅")
+    else:
+        st.error("Please enter Email and Password")
+
+st.markdown('<div class="small-text">Don\'t have an account?</div>', unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)
