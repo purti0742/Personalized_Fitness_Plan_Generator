@@ -123,7 +123,7 @@ if st.session_state.page == "login":
     email = st.text_input("Email Address")
     password = st.text_input("Password", type="password")
 
-     login = st.button("LOGIN")
+    login = st.button("LOGIN")
 
     if login:
         if email and password:
