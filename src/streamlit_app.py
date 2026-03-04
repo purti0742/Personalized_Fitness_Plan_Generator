@@ -29,7 +29,7 @@ st.markdown(f"""
 }}
 
 .block-container {{
-    padding-top: 2rem;
+    padding-top: 120px;
 }}
 
 .card {{
