@@ -117,60 +117,64 @@ if "page" not in st.session_state:
 # =====================================================
 if st.session_state.page == "login":
 
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown("<h2>PLEASE LOG IN</h2>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1,2,1])
 
-    email = st.text_input("Email Address")
-    password = st.text_input("Password", type="password")
+    with col2:
 
-    login = st.button("LOGIN")
+        st.markdown("<h2 style='text-align:center;color:#FFD700;'>PLEASE LOG IN</h2>", unsafe_allow_html=True)
 
-    if login:
-        if email and password:
-            st.session_state.page = "dashboard"
+        email = st.text_input("Email Address")
+        password = st.text_input("Password", type="password")
+
+        login = st.button("LOGIN")
+
+        if login:
+            if email and password:
+                st.session_state.page = "dashboard"
+                st.rerun()
+            else:
+                st.error("Please enter Email and Password")
+
+        signup = st.button("Don't have an account? Sign Up")
+
+        if signup:
+            st.session_state.page = "signup"
             st.rerun()
-        else:
-            st.error("Please enter Email and Password")
 
-    signup = st.button("Don't have an account? Sign Up")
-
-    if signup:
-        st.session_state.page = "signup"
-        st.rerun()
-
-    st.markdown("</div>", unsafe_allow_html=True)
+    # st.markdown("</div>", unsafe_allow_html=True)
 
 # =====================================================
 # SIGNUP PAGE
 # =====================================================
 elif st.session_state.page == "signup":
 
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown("<h2>CREATE ACCOUNT</h2>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1,2,1])
 
-    new_email = st.text_input("Email Address")
-    new_password = st.text_input("Password", type="password")
-    confirm_password = st.text_input("Confirm Password", type="password")
+    with col2:
 
-    signup_btn = st.button("SIGN UP")
+        st.markdown("<h2 style='text-align:center;color:#FFD700;'>CREATE ACCOUNT</h2>", unsafe_allow_html=True)
 
-    if signup_btn:
-        if not new_email or not new_password:
-            st.error("Please fill all fields")
-        elif new_password != confirm_password:
-            st.error("Passwords do not match")
-        else:
-            st.success("Account Created Successfully 🎉")
+        new_email = st.text_input("Email Address")
+        new_password = st.text_input("Password", type="password")
+        confirm_password = st.text_input("Confirm Password", type="password")
+
+        signup_btn = st.button("SIGN UP")
+
+        if signup_btn:
+            if not new_email or not new_password:
+                st.error("Please fill all fields")
+            elif new_password != confirm_password:
+                st.error("Passwords do not match")
+            else:
+                st.success("Account Created Successfully 🎉")
+                st.session_state.page = "login"
+                st.rerun()
+
+        login_btn = st.button("Already have an account? Login")
+
+        if login_btn:
             st.session_state.page = "login"
             st.rerun()
-
-    login_btn = st.button("Already have an account? Login")
-
-    if login_btn:
-        st.session_state.page = "login"
-        st.rerun()
-
-    st.markdown("</div>", unsafe_allow_html=True)
 
 
 # =====================================================
