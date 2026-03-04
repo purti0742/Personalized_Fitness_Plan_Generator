@@ -29,17 +29,18 @@ st.markdown(f"""
 }}
 
 .block-container {{
-    padding-top: 1rem;
+    padding-top: 2rem;
 }}
 
 .card {{
-    width: 500px;
-    margin: 80px auto;
-    padding: 40px;
-    background: rgba(0, 0, 0, 0.75);
-    border-radius: 12px;
-    text-align: center;
-    color: white;
+    width:420px;
+    margin:auto;
+    margin-top:120px;
+    padding:40px;
+    background: rgba(0,0,0,0.75);
+    border-radius:12px;
+    text-align:center;
+    color:white;
 }}
 
 h2 {{
@@ -66,8 +67,44 @@ label {{
     background-color: #ff1f2e;
     color: white;
 }}
+
+.navbar{{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:60px;
+background:rgba(0,0,0,0.9);
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 40px;
+z-index:999;
+}}
+
+.navbar-title{{
+color:white;
+font-weight:bold;
+font-size:18px;
+}}
+
+.navbar-menu{{
+color:white;
+font-size:14px;
+}}
 </style>
 """, unsafe_allow_html=True)
+
+# -----------------------
+# NAVBAR
+# -----------------------
+st.markdown("""
+<div class="navbar">
+<div class="navbar-title">FIT EVERYWHERE</div>
+<div class="navbar-menu">Home &nbsp;&nbsp; My Progress &nbsp;&nbsp; Contact</div>
+</div>
+""", unsafe_allow_html=True)
+
 
 # -----------------------
 # SESSION STATE
@@ -86,18 +123,22 @@ if st.session_state.page == "login":
     email = st.text_input("Email Address")
     password = st.text_input("Password", type="password")
 
-    if st.button("LOGIN"):
+     login = st.button("LOGIN")
+
+    if login:
         if email and password:
             st.session_state.page = "dashboard"
             st.rerun()
         else:
             st.error("Please enter Email and Password")
 
-    if st.button("Don't have an account? Sign Up"):
+    signup = st.button("Don't have an account? Sign Up")
+
+    if signup:
         st.session_state.page = "signup"
         st.rerun()
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # =====================================================
 # SIGNUP PAGE
@@ -111,7 +152,9 @@ elif st.session_state.page == "signup":
     new_password = st.text_input("Password", type="password")
     confirm_password = st.text_input("Confirm Password", type="password")
 
-    if st.button("SIGN UP"):
+    signup_btn = st.button("SIGN UP")
+
+    if signup_btn:
         if not new_email or not new_password:
             st.error("Please fill all fields")
         elif new_password != confirm_password:
@@ -121,11 +164,14 @@ elif st.session_state.page == "signup":
             st.session_state.page = "login"
             st.rerun()
 
-    if st.button("Already have an account? Login"):
+    login_btn = st.button("Already have an account? Login")
+
+    if login_btn:
         st.session_state.page = "login"
         st.rerun()
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
 
 # =====================================================
 # DASHBOARD – FITPLAN AI MODULE
@@ -159,7 +205,9 @@ elif st.session_state.page == "dashboard":
         ["Beginner", "Intermediate", "Advanced"]
     )
 
-    if st.button("Generate Workout Plan"):
+    generate = st.button("Generate Workout Plan")
+
+    if generate:
 
         if not name:
             st.error("Please enter your name")
@@ -215,6 +263,8 @@ elif st.session_state.page == "dashboard":
                 st.write(f"Rest: {rest_time}")
                 st.markdown("---")
 
-    if st.button("Logout"):
+     logout = st.button("Logout")
+
+    if logout:
         st.session_state.page = "login"
         st.rerun()
