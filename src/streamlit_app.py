@@ -43,7 +43,7 @@ st.markdown(f"""
 }}
 
 h2 {{
-    color: #00E5FF;
+    color: #FFD700;
     font-weight: bold;
 }}
 
