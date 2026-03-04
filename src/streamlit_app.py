@@ -263,7 +263,7 @@ elif st.session_state.page == "dashboard":
                 st.write(f"Rest: {rest_time}")
                 st.markdown("---")
 
-     logout = st.button("Logout")
+    logout = st.button("Logout")
 
     if logout:
         st.session_state.page = "login"
