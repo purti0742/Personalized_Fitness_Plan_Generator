@@ -42,6 +42,17 @@ st.markdown(f"""
     color: white;
 }}
 
+h2 {{
+    color: #00E5FF;
+    font-weight: bold;
+}}
+
+label {{
+    color: #FFD700 !important;
+    font-weight: 600;
+    font-size: 16px;
+}}
+
 .stButton>button {{
     width: 100%;
     background-color: #e50914;
