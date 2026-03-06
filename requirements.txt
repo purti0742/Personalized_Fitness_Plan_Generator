@@ -7,3 +7,4 @@ torch
 streamlit-lottie
 sendgrid
 pyjwt
+python-dotenv
