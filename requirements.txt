@@ -5,3 +5,5 @@ requests
 transformers
 torch
 streamlit-lottie
+sendgrid
+pyjwt
