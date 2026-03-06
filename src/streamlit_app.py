@@ -1,6 +1,6 @@
 import streamlit as st
 import random
-# from auth import create_jwt, verify_jwt, send_otp_via_sendgrid
+from auth import create_jwt, verify_jwt, send_otp_via_sendgrid
 
 # -----------------------
 # PAGE CONFIG
