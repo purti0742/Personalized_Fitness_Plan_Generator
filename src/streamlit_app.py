@@ -1,5 +1,6 @@
 import streamlit as st
 import random
+from auth import create_jwt, verify_jwt, send_otp_via_sendgrid
 
 # -----------------------
 # PAGE CONFIG
@@ -124,20 +125,37 @@ if st.session_state.page == "login":
             if st.button("LOGIN"):
                 st.session_state.page = "dashboard"
                 st.rerun()
-        else:
+        else: # This is the "OTP" branch of your login_method
             if st.button("Generate OTP"):
-                st.session_state.generated_otp = str(random.randint(100000, 999999))
-                st.info(f"OTP: {st.session_state.generated_otp}") # Terminal demo
+                if email:
+                    # Generate the OTP
+                    otp = str(random.randint(100000, 999999))
+                    st.session_state.generated_otp = otp
+                    
+                    # Call SendGrid from your auth.py
+                    if send_otp_via_sendgrid(email, otp):
+                        st.success("OTP sent to your email!")
+                    else:
+                        st.error("Failed to send email. Check API Key.")
+                else:
+                    st.warning("Please enter your email first.")
             
             user_otp = st.text_input("Enter OTP")
+            
             if st.button("Verify & Login"):
-                if user_otp == st.session_state.get("generated_otp"):
+                # 1. Check if OTP matches
+                if user_otp == st.session_state.get("generated_otp") and user_otp != "":
+                    
+                    # 2. Generate the JWT token
+                    token = create_jwt(email)
+                    
+                    # 3. Store the token and redirect
+                    st.session_state.token = token
                     st.session_state.page = "dashboard"
+                    st.success("Verified! Redirecting...")
                     st.rerun()
-
-        if st.button("Don't have an account? Sign Up"):
-            st.session_state.page = "signup"
-            st.rerun()
+                else:
+                    st.error("Invalid OTP. Please try again.")
 # =====================================================
 # SIGNUP PAGE (Data Collection)
 # =====================================================
@@ -163,11 +181,30 @@ elif st.session_state.page == "signup":
         if st.button("Already have an account? Login"):
             st.session_state.page = "login"
             st.rerun()
-
+            
 # =====================================================
 # DASHBOARD – WORKOUT PLAN GENERATOR
 # =====================================================
 elif st.session_state.page == "dashboard":
+    # 1. The Security Guard (Check for token)
+    if "token" not in st.session_state:
+        st.error("Please log in first.")
+        st.session_state.page = "login"
+        st.rerun()
+
+    # 2. The Actual Content (If token exists, this runs)
+    st.title("💪 FitPlan AI - Personalized Workout Generator")
+
+    st.subheader("Personal Details")
+    name = st.text_input("Name")
+    # ... (Keep all your existing input fields and logic here) ...
+
+    logout = st.button("Logout")
+    if logout:
+        # Clear the token on logout so they must re-verify next time
+        del st.session_state.token
+        st.session_state.page = "login"
+        st.rerun()
 
     st.title("💪 FitPlan AI - Personalized Workout Generator")
 
@@ -255,5 +292,7 @@ elif st.session_state.page == "dashboard":
     logout = st.button("Logout")
 
     if logout:
+        # Clear the token on logout so they must re-verify next time
+        del st.session_state.token
         st.session_state.page = "login"
         st.rerun()
