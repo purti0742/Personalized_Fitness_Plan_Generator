@@ -1,5 +1,7 @@
-altair
-pandas
 streamlit
-pyjwt
-python-dotenv
+pandas
+altair
+requests
+transformers
+torch
+streamlit-lottie
