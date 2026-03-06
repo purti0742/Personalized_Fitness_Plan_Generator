@@ -111,93 +111,56 @@ if "otp_verified" not in st.session_state:
 # LOGIN PAGE
 # =====================================================
 if st.session_state.page == "login":
-
     col1, col2, col3 = st.columns([1,2,1])
-
     with col2:
-
         st.markdown("<h2 style='text-align:center'>PLEASE LOG IN</h2>", unsafe_allow_html=True)
-
+        
+        # New Login Method Toggle
+        login_method = st.radio("Login via", ["Password", "OTP"], horizontal=True)
         email = st.text_input("Email Address")
-        password = st.text_input("Password", type="password")
-
-        login = st.button("LOGIN")
-
-        if login:
-            if email and password:
+        
+        if login_method == "Password":
+            password = st.text_input("Password", type="password")
+            if st.button("LOGIN"):
                 st.session_state.page = "dashboard"
                 st.rerun()
-            else:
-                st.error("Enter Email and Password")
-
-        signup = st.button("Don't have an account? Sign Up")
-
-        if signup:
-            st.session_state.page = "signup"
-            st.rerun()
-
-# =====================================================
-# SIGNUP PAGE WITH OTP
-# =====================================================
-elif st.session_state.page == "signup":
-
-    col1, col2, col3 = st.columns([1,2,1])
-
-    with col2:
-
-        st.markdown("<h2 style='text-align:center'>CREATE ACCOUNT</h2>", unsafe_allow_html=True)
-
-        new_email = st.text_input("Email Address")
-
-        if st.button("Generate OTP"):
-
-            if new_email:
-                otp = random.randint(100000,999999)
-                st.session_state.generated_otp = otp
-                st.session_state.otp_sent = True
-
-                print("OTP:", otp)   # terminal output
-
-                st.success("OTP Sent (Check terminal for demo)")
-            else:
-                st.error("Enter email first")
-
-        if st.session_state.otp_sent:
-
+        else:
+            if st.button("Generate OTP"):
+                st.session_state.generated_otp = str(random.randint(100000, 999999))
+                st.info(f"OTP: {st.session_state.generated_otp}") # Terminal demo
+            
             user_otp = st.text_input("Enter OTP")
-
-            if st.button("Verify OTP"):
-
-                if str(user_otp) == str(st.session_state.generated_otp):
-                    st.session_state.otp_verified = True
-                    st.success("Email Verified")
-                else:
-                    st.error("Invalid OTP")
-
-        if st.session_state.otp_verified:
-
-            new_password = st.text_input("Create Password", type="password")
-            confirm_password = st.text_input("Confirm Password", type="password")
-
-            signup_btn = st.button("SIGN UP")
-
-            if signup_btn:
-
-                if new_password != confirm_password:
-                    st.error("Passwords do not match")
-
-                else:
-                    st.success("Account Created Successfully 🎉")
-
-                    st.session_state.page = "login"
-                    st.session_state.otp_sent = False
-                    st.session_state.otp_verified = False
-
+            if st.button("Verify & Login"):
+                if user_otp == st.session_state.get("generated_otp"):
+                    st.session_state.page = "dashboard"
                     st.rerun()
 
-        login_btn = st.button("Already have an account? Login")
-
-        if login_btn:
+        if st.button("Don't have an account? Sign Up"):
+            st.session_state.page = "signup"
+            st.rerun()
+# =====================================================
+# SIGNUP PAGE (Data Collection)
+# =====================================================
+elif st.session_state.page == "signup":
+    col1, col2, col3 = st.columns([1,2,1])
+    with col2:
+        st.markdown("<h2 style='text-align:center'>CREATE ACCOUNT</h2>", unsafe_allow_html=True)
+        
+        with st.form("registration_form"):
+            name = st.text_input("Full Name")
+            age = st.number_input("Age", 10, 80)
+            gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+            email = st.text_input("Email Address")
+            password = st.text_input("Create Password", type="password")
+            goal = st.selectbox("Fitness Goal", ["Build Muscle", "Lose Weight", "Improve Cardio", "Flexibility"])
+            
+            if st.form_submit_button("SIGN UP"):
+                # Here you would add your DB saving logic
+                st.success("Account Created Successfully! 🎉")
+                st.session_state.page = "login"
+                st.rerun()
+        
+        if st.button("Already have an account? Login"):
             st.session_state.page = "login"
             st.rerun()
 
