@@ -156,6 +156,12 @@ if st.session_state.page == "login":
                     st.rerun()
                 else:
                     st.error("Invalid OTP. Please try again.")
+
+        st.markdown("---")
+
+        if st.button("Create New Account"):
+            st.session_state.page = "signup"
+            st.rerun() 
 # =====================================================
 # SIGNUP PAGE (Data Collection)
 # =====================================================
@@ -196,20 +202,6 @@ elif st.session_state.page == "dashboard":
     st.title("💪 FitPlan AI - Personalized Workout Generator")
 
     st.subheader("Personal Details")
-    name = st.text_input("Name")
-    # ... (Keep all your existing input fields and logic here) ...
-
-    logout = st.button("Logout")
-    if logout:
-        # Clear the token on logout so they must re-verify next time
-        del st.session_state.token
-        st.session_state.page = "login"
-        st.rerun()
-
-    st.title("💪 FitPlan AI - Personalized Workout Generator")
-
-    st.subheader("Personal Details")
-
     name = st.text_input("Name")
     age = st.number_input("Age",10,80)
     height = st.number_input("Height (cm)",100,220)
