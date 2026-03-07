@@ -1,10 +1,4 @@
 streamlit
-pandas
-altair
-requests
-transformers
-torch
-streamlit-lottie
 sendgrid
 pyjwt
 python-dotenv
