@@ -26,7 +26,11 @@ def verify_jwt(token):
     try:
         decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
         return decoded
-    except Exception:
+    except jwt.ExpiredSignatureError:
+        print("Token expired")
+        return None
+    except jwt.InvalidTokenError:
+        print("Invalid token")
         return None
 
 def send_otp_via_sendgrid(receiver_email, otp):
