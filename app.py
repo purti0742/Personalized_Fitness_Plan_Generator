@@ -98,7 +98,6 @@ div[role="radiogroup"] { padding: 10px 0; }
 # -----------------------
 st.markdown("""
 <div class="navbar">
-<div class="navbar-menu">Home &nbsp;&nbsp; My Progress &nbsp;&nbsp; Contact</div>
 </div>
 """, unsafe_allow_html=True)
 
