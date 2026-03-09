@@ -116,50 +116,57 @@ if "otp_verified" not in st.session_state:
     st.session_state.otp_verified = False
 
 # =====================================================
-# LOGIN PAGE
+# LOGIN PAGE (Cleaned UI)
 # =====================================================
 if st.session_state.page == "login":
-    # Use small gap to ensure panels touch
-    _, center, _ = st.columns([1, 10, 1])
-    with center:
-        col1, col2 = st.columns([1, 1], gap="small")
 
-        # LEFT SIDE
+    # Using a 3-column layout to center the login card on the screen
+    _, main_col, _ = st.columns([1, 4, 1])
+
+    with main_col:
+        # We use nested columns inside the centered area
+        col1, col2 = st.columns([1, 1], gap="large")
+
+        # LEFT SIDE: Branding & Info
         with col1:
-            st.markdown('<div class="left-panel">', unsafe_allow_html=True)
-            st.image("https://cdn-icons-png.flaticon.com/512/2964/2964514.png", width=180)
-            st.markdown('<div class="app-title">FIT EVERYWHERE</div>', unsafe_allow_html=True)
+            st.image(
+                "https://cdn-icons-png.flaticon.com/512/2964/2964514.png", 
+                width=150
+            )
+            st.markdown("# FIT EVERYWHERE")
+            st.markdown("### Your AI Powered Fitness Companion")
+            st.write("Generate personalized workout plans based on:")
+            
             st.markdown("""
-            <div class="app-desc">
-            Your <b>AI Powered Fitness Companion</b><br><br>
-            Generate personalized workout plans based on:<br><br>
-            • Age &nbsp;&nbsp; • Weight<br>
-            • Fitness Level &nbsp;&nbsp; • Equipment Availability<br><br>
-            Stay consistent. Stay strong. 💪
-            </div>
-            """, unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+            * **Age**
+            * **Weight**
+            * **Fitness Level**
+            * **Equipment Availability**
+            """)
+            st.info("Stay consistent. Stay strong. 💪")
 
-        # RIGHT SIDE
+        # RIGHT SIDE: Input Form
         with col2:
-            st.markdown('<div class="right-panel">', unsafe_allow_html=True)
-            st.markdown('<div class="form-title">Sign In</div>', unsafe_allow_html=True)
+            st.markdown("<h1 style='color:#ff5e62;'>Sign In</h1>", unsafe_allow_html=True)
             
             login_method = st.radio("Login via", ["Password", "OTP"], horizontal=True)
-            email = st.text_input("Email Address")
+            email = st.text_input("Email Address", placeholder="name@example.com")
 
             if login_method == "Password":
                 password = st.text_input("Password", type="password")
                 if st.button("LOGIN"):
+                    # Your existing logic
                     st.session_state.page = "dashboard"
                     st.rerun()
+
             else:
+                # OTP Logic
                 if st.button("Generate OTP"):
                     if email:
-                        otp = str(random.randint(100000,999999))
+                        otp = str(random.randint(100000, 999999))
                         st.session_state.generated_otp = otp
                         if send_otp_via_sendgrid(email, otp):
-                            st.success("OTP sent!")
+                            st.success("OTP sent successfully!")
                         else:
                             st.error("Email failed.")
                     else:
@@ -167,19 +174,19 @@ if st.session_state.page == "login":
 
                 user_otp = st.text_input("Enter OTP")
                 if st.button("Verify & Login"):
-                    if user_otp == st.session_state.get("generated_otp") and user_otp!="":
-                        st.session_state.token = create_jwt(email)
+                    if user_otp == st.session_state.get("generated_otp") and user_otp != "":
+                        token = create_jwt(email)
+                        st.session_state.token = token
                         st.session_state.page = "dashboard"
+                        st.success("Login successful!")
                         st.rerun()
                     else:
                         st.error("Invalid OTP")
 
-            st.markdown("<br>", unsafe_allow_html=True)
+            st.divider()
             if st.button("Create New Account"):
                 st.session_state.page = "signup"
                 st.rerun()
-            st.markdown("</div>", unsafe_allow_html=True)
-
 # =====================================================
 # SIGNUP PAGE
 # =====================================================
