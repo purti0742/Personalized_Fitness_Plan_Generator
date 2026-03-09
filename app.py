@@ -19,67 +19,91 @@ bg_url = "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=form
 # -----------------------
 # CUSTOM CSS
 # -----------------------
-st.markdown(f"""
+st.markdown("""
 <style>
-.stApp {{
-background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)),
-url("{bg_url}");
-background-size: cover;
-background-position: center;
-background-attachment: fixed;
-}}
 
-.block-container {{
-padding-top: 120px;
-}}
+.stApp{
+background: linear-gradient(135deg,#fdfbfb,#ebedee);
+}
 
-h2 {{
-color:#FFD700;
-font-weight:bold;
-}}
+.block-container{
+padding-top:80px;
+}
 
-label {{
-color:#FFD700 !important;
-font-weight:600;
-}}
+/* LEFT PANEL */
 
-.stButton>button {{
+.left-panel{
+background: linear-gradient(135deg,#ff9966,#ff5e62);
+border-radius:20px 0px 0px 20px;
+padding:50px;
+height:620px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+color:white;
+}
+
+/* RIGHT PANEL */
+
+.right-panel{
+background:white;
+border-radius:0px 20px 20px 0px;
+padding:50px;
+height:620px;
+box-shadow:0px 10px 40px rgba(0,0,0,0.2);
+}
+
+/* APP TITLE */
+
+.app-title{
+font-size:42px;
+font-weight:800;
+margin-top:10px;
+}
+
+/* DESCRIPTION */
+
+.app-desc{
+font-size:16px;
+margin-top:10px;
+opacity:0.9;
+}
+
+/* FORM TITLE */
+
+.form-title{
+font-size:30px;
+font-weight:700;
+color:#ff5e62;
+margin-bottom:10px;
+}
+
+/* INPUT BOX */
+
+.stTextInput input{
+border-radius:8px;
+border:1px solid #ddd;
+height:42px;
+}
+
+/* BUTTON */
+
+.stButton>button{
 width:100%;
-background:#e50914;
+background:linear-gradient(90deg,#ff9966,#ff5e62);
 color:white;
 height:45px;
-border-radius:6px;
-font-weight:bold;
-}}
+border-radius:8px;
+font-weight:600;
+border:none;
+}
 
-.stButton>button:hover {{
-background:#ff1f2e;
-}}
+.stButton>button:hover{
+opacity:0.9;
+}
 
-.navbar{{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:60px;
-background:rgba(0,0,0,0.9);
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:0 40px;
-z-index:999;
-}}
-
-.navbar-title{{
-color:white;
-font-weight:bold;
-font-size:18px;
-}}
-
-.navbar-menu{{
-color:white;
-font-size:14px;
-}}
 </style>
 """, unsafe_allow_html=True)
 
@@ -112,56 +136,101 @@ if "otp_verified" not in st.session_state:
 # LOGIN PAGE
 # =====================================================
 if st.session_state.page == "login":
-    col1, col2, col3 = st.columns([1,2,1])
+
+    col1, col2 = st.columns([1,1])
+
+    # LEFT SIDE
+    with col1:
+
+        st.markdown('<div class="left-panel">', unsafe_allow_html=True)
+
+        st.image(
+        "https://cdn-icons-png.flaticon.com/512/2964/2964514.png",
+        width=180)
+
+        st.markdown('<div class="app-title">FIT EVERYWHERE</div>', unsafe_allow_html=True)
+
+        st.markdown("""
+<div class="app-desc">
+
+Your **AI Powered Fitness Companion**
+
+Generate personalized workout plans based on:
+
+• Age  
+• Weight  
+• Fitness Level  
+• Equipment Availability  
+
+Stay consistent. Stay strong. 💪
+
+</div>
+""", unsafe_allow_html=True)
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+
+    # RIGHT SIDE
     with col2:
-        st.markdown("<h2 style='text-align:center'>PLEASE LOG IN</h2>", unsafe_allow_html=True)
-        
-        # New Login Method Toggle
+
+        st.markdown('<div class="right-panel">', unsafe_allow_html=True)
+
+        st.markdown('<div class="form-title">Sign In</div>', unsafe_allow_html=True)
+
         login_method = st.radio("Login via", ["Password", "OTP"], horizontal=True)
+
         email = st.text_input("Email Address")
-        
+
         if login_method == "Password":
+
             password = st.text_input("Password", type="password")
+
             if st.button("LOGIN"):
                 st.session_state.page = "dashboard"
                 st.rerun()
-        else: # This is the "OTP" branch of your login_method
+
+        else:
+
             if st.button("Generate OTP"):
+
                 if email:
-                    # Generate the OTP
-                    otp = str(random.randint(100000, 999999))
+
+                    otp = str(random.randint(100000,999999))
                     st.session_state.generated_otp = otp
-                    
-                    # Call SendGrid from your auth.py
+
                     if send_otp_via_sendgrid(email, otp):
-                        st.success("OTP sent to your email!")
+                        st.success("OTP sent successfully!")
+
                     else:
-                        st.error("Failed to send email. Check API Key.")
+                        st.error("Email failed.")
+
                 else:
-                    st.warning("Please enter your email first.")
-            
+                    st.warning("Enter email first.")
+
             user_otp = st.text_input("Enter OTP")
-            
+
             if st.button("Verify & Login"):
-                # 1. Check if OTP matches
-                if user_otp == st.session_state.get("generated_otp") and user_otp != "":
-                    
-                    # 2. Generate the JWT token
+
+                if user_otp == st.session_state.get("generated_otp") and user_otp!="":
+
                     token = create_jwt(email)
-                    
-                    # 3. Store the token and redirect
+
                     st.session_state.token = token
                     st.session_state.page = "dashboard"
-                    st.success("Verified! Redirecting...")
+
+                    st.success("Login successful!")
                     st.rerun()
+
                 else:
-                    st.error("Invalid OTP. Please try again.")
+                    st.error("Invalid OTP")
 
         st.markdown("---")
 
         if st.button("Create New Account"):
             st.session_state.page = "signup"
-            st.rerun() 
+            st.rerun()
+
+        st.markdown("</div>", unsafe_allow_html=True)
 # =====================================================
 # SIGNUP PAGE (Data Collection)
 # =====================================================
