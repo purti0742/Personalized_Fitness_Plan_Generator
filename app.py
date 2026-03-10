@@ -119,7 +119,6 @@ if st.session_state.page == "login":
                     cursor.execute("SELECT * FROM users WHERE email=? AND password=?", (email, password))
                     user = cursor.fetchone()
                     if user:
-                        st.session_state.token = create_jwt(email)
                         st.session_state.page = "dashboard"
                         st.rerun()
                     else:
