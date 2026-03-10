@@ -4,6 +4,34 @@ from auth import create_jwt, verify_jwt, send_otp_via_sendgrid
 import sqlite3
 
 # -----------------------
+# DATABASE CONNECTION
+# -----------------------
+conn = sqlite3.connect("fitplan.db", check_same_thread=False)
+cursor = conn.cursor()
+# Create Users Table
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users(
+name TEXT,
+age INTEGER,
+gender TEXT,
+email TEXT PRIMARY KEY,
+password TEXT,
+goal TEXT
+)
+""")
+
+# Create Workout Plan Table
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS workout_plans(
+email TEXT,
+goal TEXT,
+plan TEXT
+)
+""")
+
+conn.commit()
+
+# -----------------------
 # PAGE CONFIG
 # -----------------------
 st.set_page_config(
@@ -154,9 +182,16 @@ if st.session_state.page == "login":
             if login_method == "Password":
                 password = st.text_input("Password", type="password")
                 if st.button("LOGIN"):
-                    # Your existing logic
+                    cursor.execute("SELECT * FROM users WHERE email=? AND password=?",
+                                   (email,password))
+
+                    user = cursor.fetchone()
+
+                if user:
                     st.session_state.page = "dashboard"
                     st.rerun()
+                else:
+                    st.error("Invalid email or password")
 
             else:
                 # OTP Logic
@@ -201,7 +236,12 @@ elif st.session_state.page == "signup":
             password = st.text_input("Create Password", type="password")
             goal = st.selectbox("Fitness Goal", ["Build Muscle", "Lose Weight", "Improve Cardio", "Flexibility"])
             if st.form_submit_button("SIGN UP"):
-                st.success("Account Created Successfully! 🎉")
+                cursor.execute("INSERT INTO users (name,age,gender,email,password,goal) VALUES (?,?,?,?,?,?)",
+                    (name,age,gender,email,password,goal))
+
+    conn.commit()
+
+    st.success("Account Created Successfully! 🎉")
                 st.session_state.page = "login"
                 st.rerun()
         if st.button("Already have an account? Login"):
