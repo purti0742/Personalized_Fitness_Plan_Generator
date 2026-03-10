@@ -233,8 +233,19 @@ elif st.session_state.page == "dashboard":
             st.write(f"Rest: {rest}")
             st.markdown("---")
 
+    # -----------------------------
+        # SAVE PLAN TO DATABASE HERE
+        # -----------------------------
+        cursor.execute(
+            "INSERT INTO workout_plans (email,goal,plan) VALUES (?,?,?)",
+            (email, goal, generated_plan)
+        )
+
+        conn.commit()
+
+        st.success("Workout plan saved successfully!")
+
     if st.button("Logout"):
-        if "token" in st.session_state:
-            del st.session_state.token
+        del st.session_state.token
         st.session_state.page = "login"
         st.rerun()
