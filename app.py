@@ -86,6 +86,8 @@ if "page" not in st.session_state:
     st.session_state.page = "login"
 if "generated_otp" not in st.session_state:
     st.session_state.generated_otp = None
+if "signup_data" not in st.session_state:
+    st.session_state.signup_data = {}
 
 # =====================================================
 # LOGIN PAGE
@@ -119,6 +121,7 @@ if st.session_state.page == "login":
                     cursor.execute("SELECT * FROM users WHERE email=? AND password=?", (email, password))
                     user = cursor.fetchone()
                     if user:
+                        st.session_state.token = create_jwt(email)
                         st.session_state.page = "dashboard"
                         st.rerun()
                     else:
@@ -151,12 +154,13 @@ if st.session_state.page == "login":
                 st.rerun()
 
 # =====================================================
-# SIGNUP PAGE
+# SIGNUP PAGE (OTP VERIFICATION ADDED)
 # =====================================================
 elif st.session_state.page == "signup":
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.markdown("<h2 style='text-align:center'>CREATE ACCOUNT</h2>", unsafe_allow_html=True)
+        
         with st.form("registration_form"):
             name = st.text_input("Full Name")
             age = st.number_input("Age", 10, 80)
@@ -165,14 +169,39 @@ elif st.session_state.page == "signup":
             password = st.text_input("Create Password", type="password")
             goal = st.selectbox("Fitness Goal", ["Build Muscle", "Lose Weight", "Improve Cardio", "Flexibility"])
             
-            if st.form_submit_button("SIGN UP"):
-                cursor.execute("INSERT INTO users (name, age, gender, email, password, goal) VALUES (?,?,?,?,?,?)",
-                               (name, age, gender, email, password, goal))
-                conn.commit()
-                st.success("Account Created Successfully! 🎉")
-                st.session_state.page = "login"
-                st.rerun()
+            if st.form_submit_button("Send Verification OTP"):
+                if email and name and password:
+                    otp = str(random.randint(100000, 999999))
+                    st.session_state.generated_otp = otp
+                    st.session_state.signup_data = {
+                        "name": name, "age": age, "gender": gender, 
+                        "email": email, "password": password, "goal": goal
+                    }
+                    if send_otp_via_sendgrid(email, otp):
+                        st.info(f"OTP sent to {email}")
+                    else:
+                        st.error("Failed to send OTP.")
+                else:
+                    st.warning("Please fill all fields.")
+
+        st.markdown("---")
+        verify_code = st.text_input("Enter the OTP sent to your email")
         
+        if st.button("Verify & Complete Registration"):
+            if verify_code == st.session_state.get("generated_otp") and verify_code != "":
+                d = st.session_state.signup_data
+                try:
+                    cursor.execute("INSERT INTO users (name, age, gender, email, password, goal) VALUES (?,?,?,?,?,?)",
+                                   (d['name'], d['age'], d['gender'], d['email'], d['password'], d['goal']))
+                    conn.commit()
+                    st.success("Account Created! You can now login.")
+                    st.session_state.page = "login"
+                    st.rerun()
+                except sqlite3.IntegrityError:
+                    st.error("Email already exists.")
+            else:
+                st.error("Invalid OTP.")
+
         if st.button("Already have an account? Login"):
             st.session_state.page = "login"
             st.rerun()
@@ -215,6 +244,7 @@ elif st.session_state.page == "dashboard":
         rest = "90 sec" if age > 50 else "60 sec"
 
         st.subheader("🏋️ Your 5-Day Plan")
+        plan_text = ""
         for day in range(1, 6):
             st.markdown(f"### Day {day}")
             if goal == "Build Muscle":
@@ -227,24 +257,24 @@ elif st.session_state.page == "dashboard":
                 exercises = ["Yoga Stretch", "Hamstring Stretch", "Shoulder Mobility"]
 
             selected = random.sample(exercises, 3)
+            day_plan = f"Day {day}: "
             for ex in selected:
                 st.write(f"- {ex} – 3 sets x {reps}")
+                day_plan += f"{ex}, "
             st.write(f"Rest: {rest}")
             st.markdown("---")
+            plan_text += day_plan + " | "
 
-    # -----------------------------
-        # SAVE PLAN TO DATABASE HERE
-        # -----------------------------
-        cursor.execute(
-            "INSERT INTO workout_plans (email,goal,plan) VALUES (?,?,?)",
-            (email, goal, generated_plan)
-        )
-
-        conn.commit()
-
-        st.success("Workout plan saved successfully!")
+        # Save the plan to the database
+        token_email = verify_jwt(st.session_state.token)
+        if token_email:
+            cursor.execute("INSERT INTO workout_plans (email, goal, plan) VALUES (?,?,?)",
+                           (token_email, goal, plan_text))
+            conn.commit()
+            st.success("Plan saved to your history!")
 
     if st.button("Logout"):
-        del st.session_state.token
+        if "token" in st.session_state:
+            del st.session_state.token
         st.session_state.page = "login"
-        st.rerun() 
+        st.rerun()
