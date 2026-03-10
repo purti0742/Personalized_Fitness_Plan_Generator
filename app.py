@@ -247,4 +247,4 @@ elif st.session_state.page == "dashboard":
     if st.button("Logout"):
         del st.session_state.token
         st.session_state.page = "login"
-        st.rerun()
+        st.rerun() 
