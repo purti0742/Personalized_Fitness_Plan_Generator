@@ -9,7 +9,7 @@ def init_db():
     )""")
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS workout_plans(
-        email TEXT, goal TEXT, plan TEXT
+        email TEXT PRIMARY KEY, goal TEXT, plan TEXT
     )""")
     conn.commit()
     return conn
@@ -23,6 +23,8 @@ def add_user(name, age, gender, email, password, goal):
         return True
     except:
         return False
+    finally:
+        conn.close()
 
 def verify_user(email, password):
     conn = sqlite3.connect("fitplan.db")
