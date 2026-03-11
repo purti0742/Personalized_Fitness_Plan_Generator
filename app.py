@@ -19,24 +19,56 @@ st.set_page_config(
 )
 
 # -----------------------
-# CUSTOM CSS
+# MODERN UI CSS
 # -----------------------
 st.markdown("""
 <style>
-.block-container {
-    padding-top: 2rem;
+
+.stApp{
+background: linear-gradient(135deg,#667eea,#764ba2);
+color:white;
 }
-.stApp {
-    background: linear-gradient(135deg,#fdfbfb,#ebedee);
+
+.block-container{
+padding-top:2rem;
+padding-left:5%;
+padding-right:5%;
 }
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 5% 30px 5%;
+
+.login-card{
+background:white;
+padding:40px;
+border-radius:15px;
+box-shadow:0px 8px 25px rgba(0,0,0,0.2);
+color:black;
 }
-[data-testid="column"] {
-    padding: 0px !important;
+
+.stButton>button{
+background:linear-gradient(45deg,#ff4b2b,#ff416c);
+color:white;
+border:none;
+padding:10px 25px;
+border-radius:8px;
+font-weight:bold;
 }
+
+.stButton>button:hover{
+transform:scale(1.05);
+}
+
+.stTextInput>div>div>input{
+border-radius:8px;
+padding:10px;
+}
+
+.metric-card{
+background:white;
+padding:20px;
+border-radius:12px;
+color:black;
+box-shadow:0px 5px 15px rgba(0,0,0,0.2);
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -61,39 +93,41 @@ if "user_email" not in st.session_state:
 # =====================================================
 if st.session_state.page == "login":
 
-    _, main_col, _ = st.columns([1,4,1])
+    _, main_col, _ = st.columns([1,3,1])
 
     with main_col:
 
-        col1, col2 = st.columns([1,1])
+        col1,col2 = st.columns([1,1])
 
         with col1:
             st.image("https://cdn-icons-png.flaticon.com/512/2964/2964514.png", width=150)
             st.markdown("# FIT EVERYWHERE")
             st.markdown("### Your AI Powered Fitness Companion")
             st.write("Generate personalized workout plans based on:")
-            st.markdown("* Age\n* Weight\n* Fitness Level\n* Equipment Availability")
+            st.markdown("* Age\n* Weight\n* Fitness Level\n* Equipment")
 
         with col2:
 
-            st.markdown("<h1 style='color:#ff5e62;'>Sign In</h1>", unsafe_allow_html=True)
+            st.markdown('<div class="login-card">', unsafe_allow_html=True)
 
-            login_method = st.radio("Login via", ["Password","OTP"], horizontal=True)
+            st.markdown("## Sign In")
+
+            login_method = st.radio("Login via",["Password","OTP"],horizontal=True)
 
             email = st.text_input("Email")
 
             if login_method == "Password":
 
-                password = st.text_input("Password", type="password")
+                password = st.text_input("Password",type="password")
 
                 if st.button("LOGIN"):
 
                     user = db.verify_user(email,password)
 
                     if user:
-                        st.session_state.user_email = email
-                        st.session_state.token = create_jwt(email)
-                        st.session_state.page = "dashboard"
+                        st.session_state.user_email=email
+                        st.session_state.token=create_jwt(email)
+                        st.session_state.page="dashboard"
                         st.rerun()
 
                     else:
@@ -103,21 +137,21 @@ if st.session_state.page == "login":
 
                 if st.button("Generate OTP"):
 
-                    otp = str(random.randint(100000,999999))
-                    st.session_state.generated_otp = otp
+                    otp=str(random.randint(100000,999999))
+                    st.session_state.generated_otp=otp
 
                     if send_otp_via_sendgrid(email,otp):
                         st.success("OTP Sent")
 
-                user_otp = st.text_input("Enter OTP")
+                user_otp=st.text_input("Enter OTP")
 
                 if st.button("Verify & Login"):
 
-                    if user_otp == st.session_state.generated_otp:
+                    if user_otp==st.session_state.generated_otp:
 
-                        st.session_state.user_email = email
-                        st.session_state.token = create_jwt(email)
-                        st.session_state.page = "dashboard"
+                        st.session_state.user_email=email
+                        st.session_state.token=create_jwt(email)
+                        st.session_state.page="dashboard"
                         st.rerun()
 
                     else:
@@ -126,35 +160,38 @@ if st.session_state.page == "login":
             st.divider()
 
             if st.button("Create New Account"):
-                st.session_state.page = "signup"
+                st.session_state.page="signup"
                 st.rerun()
 
+            st.markdown("</div>",unsafe_allow_html=True)
 
 
 # =====================================================
 # SIGNUP PAGE
 # =====================================================
-elif st.session_state.page == "signup":
+elif st.session_state.page=="signup":
 
-    col1,col2,col3 = st.columns([1,2,1])
+    col1,col2,col3=st.columns([1,2,1])
 
     with col2:
 
-        st.markdown("## CREATE ACCOUNT")
+        st.markdown('<div class="login-card">', unsafe_allow_html=True)
 
-        name = st.text_input("Full Name")
-        age = st.number_input("Age",10,80)
-        gender = st.selectbox("Gender",["Male","Female","Other"])
-        email = st.text_input("Email Address")
-        password = st.text_input("Password",type="password")
-        goal = st.selectbox("Goal",["Build Muscle","Lose Weight","Improve Cardio"])
+        st.markdown("## Create Account")
+
+        name=st.text_input("Full Name")
+        age=st.number_input("Age",10,80)
+        gender=st.selectbox("Gender",["Male","Female","Other"])
+        email=st.text_input("Email Address")
+        password=st.text_input("Password",type="password")
+        goal=st.selectbox("Goal",["Build Muscle","Lose Weight","Improve Cardio"])
 
         if st.button("Send OTP"):
 
-            otp = str(random.randint(100000,999999))
-            st.session_state.generated_otp = otp
+            otp=str(random.randint(100000,999999))
+            st.session_state.generated_otp=otp
 
-            st.session_state.signup_temp_data = {
+            st.session_state.signup_temp_data={
                 "name":name,
                 "age":age,
                 "gender":gender,
@@ -167,13 +204,13 @@ elif st.session_state.page == "signup":
 
             st.success("OTP Sent")
 
-        verify = st.text_input("Enter OTP")
+        verify=st.text_input("Enter OTP")
 
         if st.button("Verify & Signup"):
 
-            if verify == st.session_state.generated_otp:
+            if verify==st.session_state.generated_otp:
 
-                d = st.session_state.signup_temp_data
+                d=st.session_state.signup_temp_data
 
                 db.add_user(
                     d['name'],
@@ -196,81 +233,83 @@ elif st.session_state.page == "signup":
             st.session_state.page="login"
             st.rerun()
 
+        st.markdown("</div>",unsafe_allow_html=True)
 
 
 # =====================================================
 # DASHBOARD
 # =====================================================
-elif st.session_state.page == "dashboard":
+elif st.session_state.page=="dashboard":
 
-    st.title("🏋️ FitPlan AI - Personalized Fitness Planner")
+    st.title("🏋️ FitPlan AI Dashboard")
 
-    tabs = st.tabs(["Dashboard","Profile","Workout Plan","Weight Tracker","Logout"])
+    tabs=st.tabs(["Dashboard","Profile","Workout Plan","Weight Tracker","Logout"])
 
-    # -------------------------------------------------
     # DASHBOARD TAB
-    # -------------------------------------------------
     with tabs[0]:
 
         st.subheader("Welcome")
 
         st.info(f"Logged in as {st.session_state.user_email}")
 
-        st.write("Use the menu to manage your fitness journey.")
+        c1,c2,c3=st.columns(3)
+
+        with c1:
+            st.metric("AI Workout Plans","Enabled")
+
+        with c2:
+            st.metric("Weight Tracking","Active")
+
+        with c3:
+            st.metric("Goal","Fitness Progress")
 
 
-
-    # -------------------------------------------------
     # PROFILE TAB
-    # -------------------------------------------------
     with tabs[1]:
 
         st.subheader("Profile")
 
-        name = st.text_input("Name")
-        age = st.number_input("Age",10,80)
-        height = st.number_input("Height (cm)",100,220)
-        weight = st.number_input("Weight (kg)",30,200)
+        name=st.text_input("Name")
+        age=st.number_input("Age",10,80)
+        height=st.number_input("Height (cm)",100,220)
+        weight=st.number_input("Weight (kg)",30,200)
 
         if st.button("Update Profile"):
             st.success("Profile Updated")
 
 
-
-    # -------------------------------------------------
     # WORKOUT PLAN TAB
-    # -------------------------------------------------
     with tabs[2]:
 
         st.subheader("Generate Workout Plan")
 
-        goal = st.selectbox(
+        goal=st.selectbox(
             "Goal",
             ["Build Muscle","Lose Weight","Improve Cardio","Flexibility"]
         )
 
-        equipment = st.selectbox(
+        equipment=st.selectbox(
             "Equipment",
             ["No Equipment","Dumbbells","Gym Equipment"]
         )
 
-        level = st.selectbox(
+        level=st.selectbox(
             "Fitness Level",
             ["Beginner","Intermediate","Advanced"]
         )
 
         if st.button("Generate AI Workout Plan"):
 
-            height_m = height / 100 if height > 0 else 1.7
+            height_m=height/100 if height>0 else 1.7
 
-            bmi = round(weight / (height_m**2),2)
+            bmi=round(weight/(height_m**2),2)
 
-            bmi_status = "Normal"
+            bmi_status="Normal"
 
-            if bmi > 25:
+            if bmi>25:
                 bmi_status="Overweight"
 
-            plan = model.generate_workout(
+            plan=model.generate_workout(
                 name,
                 age,
                 goal,
@@ -290,34 +329,26 @@ elif st.session_state.page == "dashboard":
             )
 
 
-
-    # -------------------------------------------------
-    # WEIGHT TRACKER TAB
-    # -------------------------------------------------
+    # WEIGHT TRACKER
     with tabs[3]:
 
         st.subheader("Weight Tracker")
 
-        today_weight = st.number_input(
-            "Enter today's weight",
-            30.0,
-            200.0
-        )
+        today_weight=st.number_input("Enter today's weight",30.0,200.0)
 
         if st.button("Save Weight"):
 
             db.save_weight(
                 st.session_state.user_email,
-                today_weight
+                today_weight,
+                "today"
             )
 
             st.success("Weight Saved")
 
         st.subheader("Weight History")
 
-        weights = db.get_weights(
-            st.session_state.user_email
-        )
+        weights=db.get_weights(st.session_state.user_email)
 
         if weights:
             st.line_chart(weights)
@@ -325,18 +356,11 @@ elif st.session_state.page == "dashboard":
             st.info("No weight records found")
 
 
-
-    # -------------------------------------------------
-    # LOGOUT TAB
-    # -------------------------------------------------
+    # LOGOUT
     with tabs[4]:
-
-        st.subheader("Logout")
 
         if st.button("Logout"):
 
             st.session_state.clear()
-
             st.session_state.page="login"
-
             st.rerun()
