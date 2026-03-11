@@ -4,7 +4,7 @@ import os
 # Use a model like Llama 3 or Mistral
 API_URL = "https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-3B-Instruct"
 # On Hugging Face Spaces, set HF_TOKEN in Settings > Secrets
-headers = {"Authorization": f"Bearer {os.getenv('HF_TOKEN')}"}
+headers = {"Authorization": f"Bearer {os.getenv('HF_TOKENN')}"}
 
 def generate_workout(name, age, goal, level, equipment, bmi):
     prompt = f"""
