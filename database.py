@@ -7,7 +7,6 @@ def init_db():
     conn = sqlite3.connect("fitplan.db", check_same_thread=False)
     cursor = conn.cursor()
 
-    # Users Table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users(
         name TEXT,
@@ -19,7 +18,6 @@ def init_db():
     )
     """)
 
-    # Workout Plan Table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS workout_plans_v2(
         email TEXT PRIMARY KEY,
@@ -28,7 +26,6 @@ def init_db():
     )
     """)
 
-    # Weight Tracking Table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS weights(
         email TEXT,
@@ -42,7 +39,7 @@ def init_db():
 
 
 # -----------------------
-# ADD NEW USER
+# ADD USER
 # -----------------------
 def add_user(name, age, gender, email, password, goal):
     conn = sqlite3.connect("fitplan.db")
@@ -62,7 +59,7 @@ def add_user(name, age, gender, email, password, goal):
 
 
 # -----------------------
-# VERIFY LOGIN
+# VERIFY USER
 # -----------------------
 def verify_user(email, password):
     conn = sqlite3.connect("fitplan.db")
@@ -99,9 +96,9 @@ def save_workout(email, goal, plan):
 
 
 # -----------------------
-# ADD WEIGHT ENTRY
+# SAVE WEIGHT
 # -----------------------
-def add_weight(email, weight, date):
+def save_weight(email, weight, date):
     conn = sqlite3.connect("fitplan.db")
     cursor = conn.cursor()
 
