@@ -24,6 +24,14 @@ def add_user(name, age, gender, email, password, goal):
     except:
         return False
 
+def verify_user(email, password):
+    conn = sqlite3.connect("fitplan.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE email=? AND password=?", (email, password))
+    user = cursor.fetchone()
+    conn.close()
+    return user # Returns the user row if found, otherwise None
+
 def save_workout(email, goal, plan):
     conn = sqlite3.connect("fitplan.db")
     cursor = conn.cursor()
