@@ -209,8 +209,50 @@ elif st.session_state.page == "dashboard":
 
     st.title("💪 FitPlan AI - Personalized Workout Generator")
     
-    # ... Rest of your Dashboard Logic stays the same ...
-    # (Simplified for display, but keep your original BMI logic here)
+    st.subheader("Personal Details")
+    name = st.text_input("Name")
+    age = st.number_input("Age", 10, 80)
+    height = st.number_input("Height (cm)", 100, 220)
+    weight = st.number_input("Weight (kg)", 30, 200)
+
+    st.subheader("Fitness Details")
+    goal = st.selectbox("Goal", ["Build Muscle", "Lose Weight", "Improve Cardio", "Flexibility"])
+    equipment = st.selectbox("Equipment", ["No Equipment", "Dumbbells", "Gym Equipment"])
+    level = st.selectbox("Fitness Level", ["Beginner", "Intermediate", "Advanced"])
+
+    if st.button("Generate Workout Plan"):
+        height_m = height/100
+        bmi = round(weight/(height_m**2), 2)
+
+        if bmi < 18.5: bmi_status = "Underweight"
+        elif bmi < 24.9: bmi_status = "Normal"
+        elif bmi < 29.9: bmi_status = "Overweight"
+        else: bmi_status = "Obese"
+
+        st.success(f"Hello {name} 💪")
+        st.write(f"Your BMI: {bmi} ({bmi_status})")
+
+        reps = "15 reps" if weight > 85 else "10 reps" if weight < 55 else "12 reps"
+        rest = "90 sec" if age > 50 else "60 sec"
+
+        st.subheader("🏋️ Your 5-Day Plan")
+        for day in range(1, 6):
+            st.markdown(f"### Day {day}")
+            if goal == "Build Muscle":
+                exercises = ["Push-ups", "Squats", "Bench Press", "Deadlifts", "Bicep Curls"]
+            elif goal == "Lose Weight":
+                exercises = ["Burpees", "Jump Rope", "Mountain Climbers", "High Knees"]
+            elif goal == "Improve Cardio":
+                exercises = ["Running", "Cycling", "Skipping", "Rowing"]
+            else:
+                exercises = ["Yoga Stretch", "Hamstring Stretch", "Shoulder Mobility"]
+
+            selected = random.sample(exercises, 3)
+            for ex in selected:
+                st.write(f"- {ex} – 3 sets x {reps}")
+            st.write(f"Rest: {rest}")
+            st.markdown("---")
+
     
     if st.button("Logout"):
         del st.session_state.token
