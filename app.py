@@ -24,25 +24,35 @@ st.set_page_config(
 st.markdown("""
 <style>
 
+/* APP BACKGROUND */
 .stApp{
 background: linear-gradient(135deg,#667eea,#764ba2);
 color:white;
 }
 
+/* REMOVE STREAMLIT DEFAULT WHITE BACKGROUND */
+section.main > div{
+background-color: transparent !important;
+}
+
+/* CONTAINER SPACING */
 .block-container{
 padding-top:2rem;
 padding-left:5%;
 padding-right:5%;
 }
 
+/* LOGIN CARD - TRANSPARENT */
 .login-card{
-background:white;
+background: rgba(255,255,255,0.1);
+backdrop-filter: blur(10px);
 padding:40px;
 border-radius:15px;
 box-shadow:0px 8px 25px rgba(0,0,0,0.2);
-color:black;
+color:white;
 }
 
+/* BUTTON STYLE */
 .stButton>button{
 background:linear-gradient(45deg,#ff4b2b,#ff416c);
 color:white;
@@ -52,21 +62,36 @@ border-radius:8px;
 font-weight:bold;
 }
 
+/* BUTTON HOVER */
 .stButton>button:hover{
 transform:scale(1.05);
 }
 
-.stTextInput>div>div>input{
+/* INPUT BOX */
+.stTextInput>div>div>input,
+.stNumberInput>div>div>input{
 border-radius:8px;
 padding:10px;
+background:rgba(255,255,255,0.2);
+color:white;
+border:none;
 }
 
-.metric-card{
-background:white;
-padding:20px;
-border-radius:12px;
-color:black;
-box-shadow:0px 5px 15px rgba(0,0,0,0.2);
+/* RADIO / SELECT */
+.stSelectbox>div>div{
+background:rgba(255,255,255,0.2);
+border-radius:8px;
+}
+
+/* REMOVE WHITE CHART BACKGROUND */
+[data-testid="stChart"]{
+background:transparent;
+}
+
+/* TABS */
+.stTabs [data-baseweb="tab"]{
+color:white;
+font-size:16px;
 }
 
 </style>
