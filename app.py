@@ -1,7 +1,13 @@
 import streamlit as st
 import random
+import database as db
 from auth import create_jwt, verify_jwt, send_otp_via_sendgrid
 import model
+
+# -----------------------
+# INITIALIZE DB
+# -----------------------
+db.init_db()
 
 # -----------------------
 # PAGE CONFIG
@@ -106,6 +112,8 @@ if "otp_verified" not in st.session_state:
     st.session_state.otp_verified = False
 if "signup_temp_data" not in st.session_state:
     st.session_state.signup_temp_data = {}
+if "user_email" not in st.session_state:
+    st.session_state.user_email = None
 
 # =====================================================
 # LOGIN PAGE (Cleaned UI)
@@ -119,40 +127,35 @@ if st.session_state.page == "login":
         # We use nested columns inside the centered area
         col1, col2 = st.columns([1, 1], gap="large")
 
-        # LEFT SIDE: Branding & Info
+        # LEFT SIDE
         with col1:
-            st.image(
-                "https://cdn-icons-png.flaticon.com/512/2964/2964514.png", 
-                width=150
-            )
+            st.image("https://cdn-icons-png.flaticon.com/512/2964/2964514.png", width=150)
             st.markdown("# FIT EVERYWHERE")
             st.markdown("### Your AI Powered Fitness Companion")
             st.write("Generate personalized workout plans based on:")
-            
-            st.markdown("""
-            * **Age**
-            * **Weight**
-            * **Fitness Level**
-            * **Equipment Availability**
-            """)
+            st.markdown("* **Age**\n* **Weight**\n* **Fitness Level**\n* **Equipment Availability**")
             st.info("Stay consistent. Stay strong. 💪")
 
-        # RIGHT SIDE: Input Form
+        # RIGHT SIDE
         with col2:
             st.markdown("<h1 style='color:#ff5e62;'>Sign In</h1>", unsafe_allow_html=True)
-            
             login_method = st.radio("Login via", ["Password", "OTP"], horizontal=True)
             email = st.text_input("Email Address", placeholder="name@example.com")
 
             if login_method == "Password":
                 password = st.text_input("Password", type="password")
                 if st.button("LOGIN"):
-                    # Your existing logic
-                    st.session_state.page = "dashboard"
-                    st.rerun()
+                    # INTEGRATION: Verify user in DB
+                    user = db.verify_user(email, password)
+                    if user:
+                        st.session_state.user_email = email
+                        st.session_state.token = create_jwt(email)
+                        st.session_state.page = "dashboard"
+                        st.rerun()
+                    else:
+                        st.error("Invalid email or password")
 
             else:
-                # OTP Logic
                 if st.button("Generate OTP"):
                     if email:
                         otp = str(random.randint(100000, 999999))
@@ -167,8 +170,8 @@ if st.session_state.page == "login":
                 user_otp = st.text_input("Enter OTP")
                 if st.button("Verify & Login"):
                     if user_otp == st.session_state.get("generated_otp") and user_otp != "":
-                        token = create_jwt(email)
-                        st.session_state.token = token
+                        st.session_state.user_email = email
+                        st.session_state.token = create_jwt(email)
                         st.session_state.page = "dashboard"
                         st.success("Login successful!")
                         st.rerun()
@@ -179,15 +182,15 @@ if st.session_state.page == "login":
             if st.button("Create New Account"):
                 st.session_state.page = "signup"
                 st.rerun()
+
 # =====================================================
-# UPDATED SIGNUP PAGE
+# SIGNUP PAGE
 # =====================================================
 elif st.session_state.page == "signup":
     col1, col2, col3 = st.columns([1,2,1])
     with col2:
         st.markdown("<h2 style='text-align:center'>CREATE ACCOUNT</h2>", unsafe_allow_html=True)
         
-        # Step A: Collect Info
         with st.form("registration_form"):
             name = st.text_input("Full Name")
             age = st.number_input("Age", 10, 80)
@@ -200,7 +203,6 @@ elif st.session_state.page == "signup":
                 if email and name and password:
                     otp = str(random.randint(100000, 999999))
                     st.session_state.generated_otp = otp
-                    # Store data temporarily until verified
                     st.session_state.signup_temp_data = {
                         "name": name, "age": age, "gender": gender, 
                         "email": email, "password": password, "goal": goal
@@ -208,24 +210,21 @@ elif st.session_state.page == "signup":
                     if send_otp_via_sendgrid(email, otp):
                         st.info(f"A verification code has been sent to {email}")
                     else:
-                        st.error("Failed to send OTP. Check your configuration.")
+                        st.error("Failed to send OTP.")
                 else:
                     st.warning("Please fill all fields before requesting OTP.")
 
-        # Step B: Verify and Save
         st.markdown("---")
         verify_otp = st.text_input("Enter Verification OTP")
         if st.button("Verify & Complete Sign Up"):
             if verify_otp == st.session_state.get("generated_otp") and verify_otp != "":
                 d = st.session_state.signup_temp_data
-                try:
-                    cursor.execute("INSERT INTO users (name, age, gender, email, password, goal) VALUES (?,?,?,?,?,?)",
-                                   (d['name'], d['age'], d['gender'], d['email'], d['password'], d['goal']))
-                    conn.commit()
+                # INTEGRATION: Use database helper
+                if db.add_user(d['name'], d['age'], d['gender'], d['email'], d['password'], d['goal']):
                     st.success("Account Verified and Created! 🎉")
                     st.session_state.page = "login"
                     st.rerun()
-                except sqlite3.IntegrityError:
+                else:
                     st.error("This email is already registered.")
             else:
                 st.error("Invalid OTP. Please try again.")
@@ -238,8 +237,6 @@ elif st.session_state.page == "signup":
 # DASHBOARD
 # =====================================================
 elif st.session_state.page == "dashboard":
-    import model  
-
     if "token" not in st.session_state:
         st.error("Please log in first.")
         st.session_state.page = "login"
@@ -263,43 +260,32 @@ elif st.session_state.page == "dashboard":
             st.warning("Please enter your name first.")
         else:
             with st.spinner("🤖 AI is crafting your custom workout..."):
-                # 1. Calculate BMI
-                height_m = height / 100
+                height_m = height / 100 if height > 0 else 1.7
                 bmi = round(weight / (height_m**2), 2)
-                bmi_status = "Normal" if 18.5 <= bmi <= 24.9 else "Overweight" # Simplified for logic
+                bmi_status = "Normal" if 18.5 <= bmi <= 24.9 else "Overweight"
 
-                # 2. Call the AI Model
                 ai_response = model.generate_workout(name, age, goal, level, equipment, bmi_status)
 
-                # 3. CRITICAL FIX: Save data for the View Plan page
                 st.session_state.generated_plan = ai_response
                 st.session_state.user_details = {"name": name, "goal": goal}
                 
-                # 4. Save to Database
-                try:
-                    cursor.execute(
-                        "INSERT INTO workout_plans (email, goal, plan) VALUES (?, ?, ?)",
-                        (st.session_state.get('email', 'Guest'), goal, ai_response)
-                    )
-                    conn.commit()
-                except:
-                    pass
+                # INTEGRATION: Save to database helper
+                current_user = st.session_state.get('user_email', 'Guest')
+                db.save_workout(current_user, goal, ai_response)
                 
-                # 5. SWITCH PAGE
                 st.session_state.page = "view_plan"
                 st.rerun()
 
     st.markdown("---")
     if st.button("Logout"):
-        if "token" in st.session_state:
-            del st.session_state.token
+        st.session_state.clear()
         st.session_state.page = "login"
-        st.rerun()               
+        st.rerun()
+
 # =====================================================
-# VIEW PLAN PAGE (The "Nice UI" Page)
+# VIEW PLAN PAGE
 # =====================================================
 elif st.session_state.page == "view_plan":
-    # Custom Header for this page
     st.markdown(f"""
         <div style="background: linear-gradient(90deg,#ff9966,#ff5e62); padding: 40px; border-radius: 15px; text-align: center; color: white;">
             <h1 style="margin:0;">🔥 Your Personalized FitPlan</h1>
@@ -307,30 +293,26 @@ elif st.session_state.page == "view_plan":
         </div>
     """, unsafe_allow_html=True)
 
-    st.write("") # Spacer
+    st.write("") 
 
     col1, col2 = st.columns([2, 1])
 
     with col1:
-        # Display the AI Plan inside a clean white card
         st.markdown("""
             <div style="background-color: white; padding: 30px; border-radius: 15px; border-left: 5px solid #ff5e62; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                 <h3 style="color: #333;">📋 Workout Schedule</h3>
             </div>
         """, unsafe_allow_html=True)
-        
-        # Display the actual text from the model
         st.info(st.session_state.get('generated_plan', "No plan found."))
 
     with col2:
-        # Side summary card
         st.markdown(f"""
             <div style="background-color: #f8f9fa; padding: 20px; border-radius: 15px; border: 1px solid #eee;">
                 <h4>Summary</h4>
                 <p><b>Goal:</b> {st.session_state.user_details['goal']}</p>
                 <p><b>Status:</b> Active ✅</p>
                 <hr>
-                <p style="font-size: 0.8rem; color: #666;">This plan was generated by FitPlan AI based on your unique biometric data.</p>
+                <p style="font-size: 0.8rem; color: #666;">Generated via FitPlan AI.</p>
             </div>
         """, unsafe_allow_html=True)
         
@@ -339,6 +321,6 @@ elif st.session_state.page == "view_plan":
             st.rerun()
             
         if st.button("Logout"):
-            del st.session_state.token
+            st.session_state.clear()
             st.session_state.page = "login"
             st.rerun()
