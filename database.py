@@ -8,7 +8,7 @@ def init_db():
         name TEXT, age INTEGER, gender TEXT, email TEXT PRIMARY KEY, password TEXT, goal TEXT
     )""")
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS workout_plans(
+    CREATE TABLE IF NOT EXISTS workout_plans_v2(
         email TEXT PRIMARY KEY, goal TEXT, plan TEXT
     )""")
     conn.commit()
@@ -39,7 +39,7 @@ def save_workout(email, goal, plan):
     cursor = conn.cursor()
     # This checks if a plan exists; if so, it replaces it. Otherwise, it inserts.
     cursor.execute("""
-        INSERT INTO workout_plans (email, goal, plan) 
+        INSERT INTO workout_plans_v2 (email, goal, plan) 
         VALUES (?, ?, ?)
         ON CONFLICT(email) DO UPDATE SET goal=excluded.goal, plan=excluded.plan
     """, (email, goal, plan))
