@@ -2,7 +2,7 @@ import requests
 import os
 
 # Use a model like Llama 3 or Mistral
-API_URL = "https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-3B-Instruct"
+API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3"
 # On Hugging Face Spaces, set HF_TOKEN in Settings > Secrets
 headers = {"Authorization": f"Bearer {os.getenv('HF_TOKENN')}"}
 
