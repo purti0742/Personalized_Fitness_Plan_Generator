@@ -42,7 +42,7 @@ padding-left:5%;
 padding-right:5%;
 }
 
-/* LOGIN CARD - TRANSPARENT */
+/* LOGIN CARD */
 .login-card{
 background: rgba(255,255,255,0.1);
 backdrop-filter: blur(10px);
@@ -67,20 +67,27 @@ font-weight:bold;
 transform:scale(1.05);
 }
 
-/* INPUT BOX */
+/* INPUT BOX FIX (GLASS STYLE) */
 .stTextInput>div>div>input,
 .stNumberInput>div>div>input{
 border-radius:8px;
 padding:10px;
-background:rgba(255,255,255,0.2);
-color:white;
-border:none;
+background:rgba(255,255,255,0.25);  /* transparent glass */
+color:black;                        /* visible text */
+border:1px solid rgba(255,255,255,0.4);
 }
 
-/* RADIO / SELECT */
+/* PLACEHOLDER */
+::placeholder{
+color:#333;
+}
+
+/* SELECT BOX */
 .stSelectbox>div>div{
-background:rgba(255,255,255,0.2);
+background:rgba(255,255,255,0.25);
+color:black;
 border-radius:8px;
+border:1px solid rgba(255,255,255,0.4);
 }
 
 /* REMOVE WHITE CHART BACKGROUND */
@@ -96,7 +103,6 @@ font-size:16px;
 
 </style>
 """, unsafe_allow_html=True)
-
 # -----------------------
 # SESSION STATES
 # -----------------------
