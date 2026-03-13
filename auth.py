@@ -33,8 +33,11 @@ def verify_jwt(token):
         print("Invalid token")
         return None
 
+# Initialize the client once at the module level
+sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+
 def send_otp_via_sendgrid(receiver_email, otp):
-    # Ensure this email matches exactly what you verified in SendGrid
+    # 1. Define the from_email and the message content inside the function
     from_email = os.getenv("SENDGRID_FROM_EMAIL", "your-verified-sender@example.com")
     
     message = Mail(
@@ -44,9 +47,10 @@ def send_otp_via_sendgrid(receiver_email, otp):
         html_content=f'<strong>Your verification code is: {otp}</strong>'
     )
     
+    # 2. Perform the send action
     try:
-        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(message)
+        # 202 is the success status code for SendGrid's API
         return response.status_code == 202
     except Exception as e:
         print(f"SendGrid Error: {e}")
