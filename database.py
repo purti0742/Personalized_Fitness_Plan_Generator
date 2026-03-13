@@ -1,10 +1,17 @@
 import sqlite3
 
 # -----------------------
+# DATABASE CONNECTION
+# -----------------------
+def get_connection():
+    return sqlite3.connect("fitplan.db", check_same_thread=False)
+
+
+# -----------------------
 # DATABASE INITIALIZATION
 # -----------------------
 def init_db():
-    conn = sqlite3.connect("fitplan.db", check_same_thread=False)
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -35,14 +42,15 @@ def init_db():
     """)
 
     conn.commit()
-    return conn
+    conn.close()
 
 
 # -----------------------
-# ADD USER
+# ADD USER (SIGNUP)
 # -----------------------
 def add_user(name, age, gender, email, password, goal):
-    conn = sqlite3.connect("fitplan.db")
+
+    conn = get_connection()
     cursor = conn.cursor()
 
     try:
@@ -52,17 +60,20 @@ def add_user(name, age, gender, email, password, goal):
         )
         conn.commit()
         return True
-    except:
+
+    except sqlite3.IntegrityError:
         return False
+
     finally:
         conn.close()
 
 
 # -----------------------
-# VERIFY USER
+# VERIFY USER (LOGIN)
 # -----------------------
 def verify_user(email, password):
-    conn = sqlite3.connect("fitplan.db")
+
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
@@ -77,10 +88,30 @@ def verify_user(email, password):
 
 
 # -----------------------
+# GET USER DETAILS ⭐ IMPORTANT
+# -----------------------
+def get_user(email):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT name, age, gender, email, goal FROM users WHERE email=?",
+        (email,)
+    )
+
+    user = cursor.fetchone()
+    conn.close()
+
+    return user
+
+
+# -----------------------
 # SAVE WORKOUT PLAN
 # -----------------------
 def save_workout(email, goal, plan):
-    conn = sqlite3.connect("fitplan.db")
+
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -99,7 +130,8 @@ def save_workout(email, goal, plan):
 # SAVE WEIGHT
 # -----------------------
 def save_weight(email, weight, date):
-    conn = sqlite3.connect("fitplan.db")
+
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
@@ -115,7 +147,8 @@ def save_weight(email, weight, date):
 # GET WEIGHT HISTORY
 # -----------------------
 def get_weights(email):
-    conn = sqlite3.connect("fitplan.db")
+
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
