@@ -2,23 +2,23 @@ import requests
 import os
 
 # Use a model like Llama 3 or Mistral
-API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3"
+API_URL = "https://api-inference.huggingface.co/models/google/gemma-2-9b-it"
 # On Hugging Face Spaces, set HF_TOKEN in Settings > Secrets
 headers = {"Authorization": f"Bearer {os.getenv('HF_TOKENN')}"}
 
 def generate_workout(name, age, goal, level, equipment, bmi):
-    prompt = f"""
-    User: {name}, Age: {age}, Goal: {goal}, Fitness Level: {level}, Equipment: {equipment}, BMI: {bmi}.
-    Task: Provide a professional 5-day workout plan. 
-    Format: List 3 exercises per day with sets and reps. Keep it short and motivating.
-    """
+    # Pro Tip: Add "Return only the workout plan" to the prompt
+    prompt = f"User: {name}, Age: {age}, Goal: {goal}, Level: {level}, Equipment: {equipment}, BMI: {bmi}. Provide a professional 5-day workout plan with 3 exercises per day. Return ONLY the plan, no extra conversational text."
     
     try:
-        response = requests.post(API_URL, headers=headers, json={"inputs": prompt})
+        response = requests.post(API_URL, headers=headers, json={
+            "inputs": prompt,
+            "parameters": {"max_new_tokens": 500, "return_full_text": False} # This ensures you don't get the prompt back
+        })
         result = response.json()
-        # Handle different response formats from HF models
-        if isinstance(result, list):
-            return result[0]['generated_text']
-        return result.get('generated_text', "AI is busy, please try again.")
+        
+        if isinstance(result, list) and len(result) > 0:
+            return result[0].get('generated_text', "No text generated.")
+        return "AI is busy or error occurred."
     except Exception as e:
-        return f"Could not generate plan: {str(e)}"
+        return f"Error: {str(e)}"
