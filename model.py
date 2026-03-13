@@ -2,7 +2,7 @@ import requests
 import os
 
 # Use a model like Llama 3 or Mistral
-API_URL = "https://api-inference.huggingface.co/models/google/gemma-2-9b-it"
+API_URL = "https://router.huggingface.co/models/google/gemma-2-9b-it"
 # On Hugging Face Spaces, set HF_TOKEN in Settings > Secrets
 headers = {"Authorization": f"Bearer {os.getenv('HF_TOKENN')}"}
 
