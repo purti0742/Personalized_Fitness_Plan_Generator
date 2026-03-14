@@ -3,8 +3,9 @@ import jwt
 import datetime
 import os
 from dotenv import load_dotenv
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
+
 
 # Call this once
 load_dotenv()
@@ -33,25 +34,22 @@ def verify_jwt(token):
         print("Invalid token")
         return None
 
-# Initialize the client once at the module level
-sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-
-def send_otp_via_sendgrid(receiver_email, otp):
-    # 1. Define the from_email and the message content inside the function
-    from_email = os.getenv("SENDGRID_FROM_EMAIL", "your-verified-sender@example.com")
+def send_otp_via_brevo(receiver_email, otp):
+    configuration = sib_api_v3_sdk.Configuration()
+    configuration.api_key['api-key'] = os.getenv('BREVO_API_KEY')
     
-    message = Mail(
-        from_email=from_email,
-        to_emails=receiver_email,
-        subject='Your FitPlan AI OTP',
-        html_content=f'<strong>Your verification code is: {otp}</strong>'
+    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+    
+    email_content = sib_api_v3_sdk.SendSmtpEmail(
+        to=[{"email": receiver_email}],
+        sender={"name": "FitPlan AI", "email": "your-verified-email@yourdomain.com"},
+        subject="Your FitPlan AI OTP",
+        html_content=f"<strong>Your verification code is: {otp}</strong>"
     )
     
-    # 2. Perform the send action
     try:
-        response = sg.send(message)
-        # 202 is the success status code for SendGrid's API
-        return response.status_code == 202
-    except Exception as e:
-        print(f"SendGrid Error: {e}")
+        api_instance.send_transac_email(email_content)
+        return True
+    except ApiException as e:
+        print(f"Brevo Error: {e}")
         return False
