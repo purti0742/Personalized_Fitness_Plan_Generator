@@ -173,7 +173,7 @@ elif st.session_state.page=="signup":
     gender=st.selectbox("Gender",["Male","Female","Other"])
     email=st.text_input("Email")
     password=st.text_input("Password",type="password")
-    goal=st.selectbox("Goal",["Build Muscle","Lose Weight","Improve Cardio"])
+   
 
     if st.button("Send OTP"):
 
@@ -186,7 +186,6 @@ elif st.session_state.page=="signup":
             "gender":gender,
             "email":email,
             "password":password,
-            "goal":goal
         }
 
         send_otp_via_brevo(email,otp)
@@ -206,7 +205,7 @@ elif st.session_state.page=="signup":
                 data["gender"],
                 data["email"],
                 data["password"],
-                data["goal"]
+              
             )
 
             if ok:
