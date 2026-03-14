@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 import random
 import database as db
@@ -14,7 +15,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# ---------------- GLASS THEME (YOUR SAME) ----------------
+# ---------------- GLASS THEME ----------------
 st.markdown("""
 <style>
 .stApp{
@@ -59,13 +60,6 @@ color:black;
 border-radius:8px;
 border:1px solid rgba(255,255,255,0.4);
 }
-[data-testid="stChart"]{
-background:transparent;
-}
-.stTabs [data-baseweb="tab"]{
-color:white;
-font-size:16px;
-}
 </style>
 """, unsafe_allow_html=True)
 
@@ -74,6 +68,7 @@ defaults = {
     "page": "login",
     "generated_otp": None,
     "user_email": None,
+    "temp_signup": None,
     "name": "",
     "age": 20,
     "gender": "Male",
@@ -85,7 +80,6 @@ defaults = {
 for k,v in defaults.items():
     if k not in st.session_state:
         st.session_state[k] = v
-
 
 # ================= LOGIN =================
 if st.session_state.page == "login":
@@ -170,8 +164,7 @@ if st.session_state.page == "login":
 
             st.markdown('</div>',unsafe_allow_html=True)
 
-
-# ================= SIGNUP =================
+# ================= SIGNUP WITH OTP =================
 elif st.session_state.page=="signup":
 
     st.markdown("## Create Account")
@@ -183,21 +176,53 @@ elif st.session_state.page=="signup":
     password=st.text_input("Password",type="password")
     goal=st.selectbox("Goal",["Build Muscle","Lose Weight","Improve Cardio"])
 
-    if st.button("Register"):
+    if st.button("Send OTP"):
 
-        ok=db.add_user(name,age,gender,email,password,goal)
+        otp=str(random.randint(100000,999999))
+        st.session_state.generated_otp=otp
 
-        if ok:
-            st.success("Account Created")
-            st.session_state.page="login"
-            st.rerun()
+        st.session_state.temp_signup={
+            "name":name,
+            "age":age,
+            "gender":gender,
+            "email":email,
+            "password":password,
+            "goal":goal
+        }
+
+        send_otp_via_brevo(email,otp)
+        st.success("OTP Sent To Mail")
+
+    entered=st.text_input("Enter OTP")
+
+    if st.button("Verify & Register"):
+
+        if entered==st.session_state.generated_otp:
+
+            data=st.session_state.temp_signup
+
+            ok=db.add_user(
+                data["name"],
+                data["age"],
+                data["gender"],
+                data["email"],
+                data["password"],
+                data["goal"]
+            )
+
+            if ok:
+                st.success("Account Created")
+                st.session_state.page="login"
+                st.rerun()
+            else:
+                st.error("User Exists")
+
         else:
-            st.error("User Exists")
+            st.error("Wrong OTP")
 
     if st.button("Back"):
         st.session_state.page="login"
         st.rerun()
-
 
 # ================= DASHBOARD =================
 elif st.session_state.page=="dashboard":
@@ -208,36 +233,19 @@ elif st.session_state.page=="dashboard":
         ["Dashboard","Profile","Workout","Weight","Logout"]
     )
 
-    # DASHBOARD
     with tab1:
-        st.subheader(f"Welcome {st.session_state.name} 👋")
+        st.subheader(f"Welcome {st.session_state.name}")
         st.info(f"Logged in as {st.session_state.user_email}")
 
-    # PROFILE
     with tab2:
 
-        st.session_state.name = st.text_input(
-            "Name",
-            value=st.session_state.name
-        )
+        st.session_state.name = st.text_input("Name",value=st.session_state.name)
 
-        st.session_state.age = st.number_input(
-            "Age",
-            10,80,
-            value=st.session_state.age
-        )
+        st.session_state.age = st.number_input("Age",10,80,value=st.session_state.age)
 
-        st.session_state.height = st.number_input(
-            "Height",
-            100,220,
-            value=st.session_state.height
-        )
+        st.session_state.height = st.number_input("Height",100,220,value=st.session_state.height)
 
-        st.session_state.weight = st.number_input(
-            "Weight",
-            30,200,
-            value=st.session_state.weight
-        )
+        st.session_state.weight = st.number_input("Weight",30,200,value=st.session_state.weight)
 
         if st.button("Update Profile"):
 
@@ -251,20 +259,11 @@ elif st.session_state.page=="dashboard":
 
             st.success("Profile Saved")
 
-    # WORKOUT
     with tab3:
 
-        goal=st.selectbox("Goal",
-            ["Build Muscle","Lose Weight","Cardio"]
-        )
-
-        equipment=st.selectbox("Equipment",
-            ["No Equipment","Dumbbells","Gym"]
-        )
-
-        level=st.selectbox("Level",
-            ["Beginner","Intermediate","Advanced"]
-        )
+        goal=st.selectbox("Goal",["Build Muscle","Lose Weight","Cardio"])
+        equipment=st.selectbox("Equipment",["No Equipment","Dumbbells","Gym"])
+        level=st.selectbox("Level",["Beginner","Intermediate","Advanced"])
 
         if st.button("Generate Workout"):
 
@@ -293,7 +292,6 @@ elif st.session_state.page=="dashboard":
                 plan
             )
 
-    # WEIGHT
     with tab4:
 
         w=st.number_input("Today's Weight",30.0,200.0)
@@ -307,7 +305,6 @@ elif st.session_state.page=="dashboard":
         if data:
             st.line_chart(data)
 
-    # LOGOUT
     with tab5:
 
         if st.button("Logout"):
