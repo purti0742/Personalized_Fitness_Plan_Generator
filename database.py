@@ -7,8 +7,7 @@ import sqlite3
 # ----------------------------------
 
 def get_connection():
-return sqlite3.connect("fitplan.db", check_same_thread=False)
-
+    return sqlite3.connect("fitplan.db", check_same_thread=False)
 # ----------------------------------
 
 # INITIALIZE DATABASE
