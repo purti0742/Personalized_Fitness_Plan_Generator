@@ -1,50 +1,103 @@
-import google.generativeai as genai
-import os
+import random
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-def generate_workout(name, age, goal, level, equipment, bmi):
+def generate_workout(name, age, goal, level, equipment, bmi_status):
 
-    try:
-        model = genai.GenerativeModel("gemini-1.5-flash")
+    warmups = [
+        "Jumping Jacks – 2 mins",
+        "Arm Circles – 1 min",
+        "High Knees – 1 min",
+        "Light Jog – 3 mins"
+    ]
 
-        prompt = f"""
-You are an expert certified fitness trainer.
+    muscle_no_eq = [
+        "Pushups – 4 x 12",
+        "Squats – 4 x 15",
+        "Plank – 3 x 45 sec",
+        "Lunges – 3 x 12 each leg",
+        "Mountain Climbers – 3 x 30 sec"
+    ]
 
-Create a SAFE, structured, beginner-friendly 5-day workout plan.
+    muscle_dumbbells = [
+        "Dumbbell Curl – 4 x 12",
+        "Shoulder Press – 4 x 10",
+        "Goblet Squats – 4 x 12",
+        "Dumbbell Row – 4 x 10",
+        "Chest Press – 4 x 10"
+    ]
 
-Client Details:
-Name: {name}
-Age: {age}
-Goal: {goal}
-Fitness Level: {level}
-Equipment Available: {equipment}
-BMI: {bmi}
+    muscle_gym = [
+        "Bench Press – 5 x 5",
+        "Deadlift – 5 x 5",
+        "Lat Pulldown – 4 x 10",
+        "Leg Press – 4 x 12",
+        "Cable Fly – 4 x 12"
+    ]
 
-Instructions:
-- Each day must have:
-  Warmup (2 exercises)
-  Main Workout (3 exercises with sets & reps)
-  Cooldown (1 exercise)
-  One coaching tip
+    fat_loss = [
+        "Burpees – 4 x 15",
+        "Skipping – 5 mins",
+        "Mountain Climbers – 4 x 40 sec",
+        "Jump Squats – 4 x 12",
+        "Plank – 4 x 1 min"
+    ]
 
-- Keep workouts realistic and progressive.
-- Add safety advice if BMI is high or age > 40.
-- Return ONLY markdown workout plan.
-"""
+    cardio = [
+        "Running – 15 mins",
+        "Cycling – 20 mins",
+        "Jump Rope – 10 mins",
+        "Stair Climb – 10 mins",
+        "Shadow Boxing – 5 mins"
+    ]
 
-        response = model.generate_content(
-            prompt,
-            generation_config={
-                "temperature": 0.6,
-                "max_output_tokens": 800
-            }
-        )
+    plan = f"\n🔥 Hello {name}! Here is your AI Generated Workout Plan\n"
+    plan += f"\n🎯 Goal: {goal}"
+    plan += f"\n📊 Level: {level}"
+    plan += f"\n🏋 Equipment: {equipment}"
+    plan += f"\n💡 BMI Status: {bmi_status}\n"
 
-        if response and response.text:
-            return response.text
+    plan += "\n🟡 Warmup:\n"
+    for w in random.sample(warmups,2):
+        plan += f"• {w}\n"
+
+    if goal == "Build Muscle":
+
+        plan += "\n💪 Strength Training:\n"
+
+        if equipment == "No Equipment":
+            exercises = muscle_no_eq
+
+        elif equipment == "Dumbbells":
+            exercises = muscle_dumbbells
+
         else:
-            return "⚠️ AI could not generate workout. Try again."
+            exercises = muscle_gym
 
-    except Exception as e:
-        return f"❌ Gemini Error: {str(e)}"
+        count = 3 if level == "Beginner" else 4 if level == "Intermediate" else 5
+
+        for ex in random.sample(exercises,count):
+            plan += f"• {ex}\n"
+
+    elif goal == "Lose Weight":
+
+        plan += "\n🔥 Fat Burn Circuit:\n"
+
+        for ex in random.sample(fat_loss,4):
+            plan += f"• {ex}\n"
+
+    else:
+
+        plan += "\n❤️ Cardio Session:\n"
+
+        for ex in random.sample(cardio,4):
+            plan += f"• {ex}\n"
+
+    if age > 40:
+        plan += "\n⚠ Advice: Maintain moderate intensity due to age.\n"
+
+    if bmi_status == "Overweight":
+        plan += "⚠ Advice: Focus more on cardio & calorie deficit.\n"
+
+    plan += "\n✅ Stay Consistent. Drink Water. Sleep Well.\n"
+
+    return plan
