@@ -1,5 +1,6 @@
 streamlit
-sendgrid
+sib-api-v3-sdk
 pyjwt
 python-dotenv
 google-generativeai>=0.7.0
+
