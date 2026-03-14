@@ -1,16 +1,17 @@
 import sqlite3
 
-# -----------------------
-# DATABASE CONNECTION
-# -----------------------
+# ----------------------------------
+# CREATE CONNECTION
+# ----------------------------------
 def get_connection():
     return sqlite3.connect("fitplan.db", check_same_thread=False)
 
 
-# -----------------------
-# DATABASE INITIALIZATION
-# -----------------------
+# ----------------------------------
+# INITIALIZE DATABASE
+# ----------------------------------
 def init_db():
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -26,7 +27,7 @@ def init_db():
     """)
 
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS workout_plans_v2(
+    CREATE TABLE IF NOT EXISTS workout_plans(
         email TEXT PRIMARY KEY,
         goal TEXT,
         plan TEXT
@@ -45,9 +46,9 @@ def init_db():
     conn.close()
 
 
-# -----------------------
+# ----------------------------------
 # ADD USER (SIGNUP)
-# -----------------------
+# ----------------------------------
 def add_user(name, age, gender, email, password, goal):
 
     conn = get_connection()
@@ -68,9 +69,9 @@ def add_user(name, age, gender, email, password, goal):
         conn.close()
 
 
-# -----------------------
+# ----------------------------------
 # VERIFY USER (LOGIN)
-# -----------------------
+# ----------------------------------
 def verify_user(email, password):
 
     conn = get_connection()
@@ -87,16 +88,16 @@ def verify_user(email, password):
     return user
 
 
-# -----------------------
-# GET USER DETAILS ⭐ IMPORTANT
-# -----------------------
-def get_user(email):
+# ----------------------------------
+# GET USER DETAILS (DISPLAY PROFILE)
+# ----------------------------------
+def get_user_details(email):
 
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
-        "SELECT name, age, gender, email, goal FROM users WHERE email=?",
+        "SELECT name, age, gender, goal FROM users WHERE email=?",
         (email,)
     )
 
@@ -106,29 +107,29 @@ def get_user(email):
     return user
 
 
-# -----------------------
+# ----------------------------------
 # SAVE WORKOUT PLAN
-# -----------------------
+# ----------------------------------
 def save_workout(email, goal, plan):
 
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        INSERT INTO workout_plans_v2 (email, goal, plan)
-        VALUES (?, ?, ?)
-        ON CONFLICT(email) DO UPDATE SET
-        goal=excluded.goal,
-        plan=excluded.plan
+    INSERT INTO workout_plans(email, goal, plan)
+    VALUES(?,?,?)
+    ON CONFLICT(email) DO UPDATE SET
+    goal=excluded.goal,
+    plan=excluded.plan
     """, (email, goal, plan))
 
     conn.commit()
     conn.close()
 
 
-# -----------------------
+# ----------------------------------
 # SAVE WEIGHT
-# -----------------------
+# ----------------------------------
 def save_weight(email, weight, date):
 
     conn = get_connection()
@@ -143,9 +144,9 @@ def save_weight(email, weight, date):
     conn.close()
 
 
-# -----------------------
+# ----------------------------------
 # GET WEIGHT HISTORY
-# -----------------------
+# ----------------------------------
 def get_weights(email):
 
     conn = get_connection()
