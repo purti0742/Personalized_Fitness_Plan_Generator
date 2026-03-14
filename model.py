@@ -7,7 +7,7 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 def generate_workout(name, age, goal, level, equipment, bmi):
     try:
         # Use the latest stable model
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-1.5-flash-latest')
         
         prompt = f"""
         You are a professional fitness coach. Provide a detailed 5-day workout plan for:
