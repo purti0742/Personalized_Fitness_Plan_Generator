@@ -42,7 +42,7 @@ def send_otp_via_brevo(receiver_email, otp):
     
     email_content = sib_api_v3_sdk.SendSmtpEmail(
         to=[{"email": receiver_email}],
-        sender={"name": "FitPlan AI", "email": "purti0742@gmail.com"},
+        sender={"name": "FitPlan AI", "email": os.getenv("SENDER_EMAIL")},
         subject="Your FitPlan AI OTP",
         html_content=f"<strong>Your verification code is: {otp}</strong>"
     )
