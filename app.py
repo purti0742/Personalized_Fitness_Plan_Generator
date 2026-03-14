@@ -1,7 +1,7 @@
 import streamlit as st
 import random
 import database as db
-from auth import create_jwt, verify_jwt, send_otp_via_sendgrid
+from auth import create_jwt, verify_jwt, send_otp_via_brevo
 import model
 
 # -----------------------
@@ -171,7 +171,7 @@ if st.session_state.page == "login":
                     otp=str(random.randint(100000,999999))
                     st.session_state.generated_otp=otp
 
-                    if send_otp_via_sendgrid(email,otp):
+                    if send_otp_via_brevo(email,otp):
                         st.success("OTP Sent")
 
                 user_otp=st.text_input("Enter OTP")
@@ -231,7 +231,7 @@ elif st.session_state.page=="signup":
                 "goal":goal
             }
 
-            send_otp_via_sendgrid(email,otp)
+            send_otp_via_brevo(email,otp)
 
             st.success("OTP Sent")
 
