@@ -70,71 +70,76 @@ st.markdown("""
     box-shadow: 0 6px 20px rgba(255, 77, 77, 0.5) !important;
 }
 
-/* UNIVERSAL INPUT FIX - Extreme specificity */
+/* UNIVERSAL UI OVERRIDE - High Contrast */
 div[data-baseweb="input"], 
-div[data-baseweb="input"] > div,
 div[data-baseweb="base-input"],
-input[type="text"], 
-input[type="password"], 
-input[type="number"],
-textarea {
+div[data-baseweb="select"],
+div[data-baseweb="select"] > div,
+input, select, textarea {
     background-color: #1a1a2e !important;
+    background: #1a1a2e !important;
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
-    background-image: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
 }
 
-.stTextInput div[data-baseweb="base-input"],
-.stNumberInput div[data-baseweb="base-input"],
-.stSelectbox div[data-baseweb="select"] {
+/* Dropdown list contrast */
+ul[role="listbox"] {
     background-color: #1a1a2e !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    border-radius: 12px !important;
 }
 
-/* Force text color for all states */
-input, select, textarea {
-    color: #ffffff !important;
-    font-weight: 500 !important;
-}
-
-/* Placeholder visibility */
-::placeholder {
-    color: rgba(255, 255, 255, 0.4) !important;
-}
-
-/* Label and Text visibility */
-label, .stMarkdown, p, h1, h2, h3, span, [data-testid="stWidgetLabel"] p {
+li[role="option"] {
+    background-color: #1a1a2e !important;
     color: #ffffff !important;
 }
 
-/* Selectbox specific */
-div[data-baseweb="select"] {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    border-radius: 12px !important;
+li[role="option"]:hover {
+    background-color: #FF4D4D !important;
 }
 
-div[data-baseweb="select"] * {
+/* Slider contrast */
+div[data-testid="stThumbValue"] {
+    color: #FF4D4D !important;
+    font-weight: bold !important;
+}
+
+div[data-testid="stTickBar"] span {
     color: #ffffff !important;
 }
-
 
 /* Tabs */
 .stTabs [data-baseweb="tab-list"] {
-    gap: 10px;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 12px !important;
+    padding: 5px !important;
 }
 
 .stTabs [data-baseweb="tab"] {
-    background-color: rgba(255,255,255,0.05) !important;
-    border-radius: 10px 10px 0 0 !important;
-    padding: 10px 20px !important;
-    color: #888 !important;
+    color: #ffffff !important;
+    opacity: 0.6;
 }
 
 .stTabs [aria-selected="true"] {
-    background-color: rgba(255,255,255,0.1) !important;
-    color: white !important;
-    border-bottom: 2px solid #FF4D4D !important;
+    opacity: 1 !important;
+    background-color: #FF4D4D !important;
+    border-radius: 8px !important;
+}
+
+/* Label and help text */
+label, .stMarkdown, p, h1, h2, h3, span, [data-testid="stWidgetLabel"] p {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+/* Card Styling */
+.glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 2.5rem;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    margin-bottom: 2rem;
 }
 
 /* Animations */
@@ -448,8 +453,9 @@ elif st.session_state.page == "dashboard":
                 st.session_state.last_plan = plan
                 db.save_workout(st.session_state.user_email, local_goal, plan)
                 st.success("Plan Generated Successfully!")
-                st.markdown("---")
+                st.markdown('<div class="glass-card">', unsafe_allow_html=True)
                 st.markdown(plan)
+                st.markdown('</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
     with tab3:
