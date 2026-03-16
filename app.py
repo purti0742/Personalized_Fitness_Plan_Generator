@@ -70,27 +70,40 @@ st.markdown("""
     box-shadow: 0 6px 20px rgba(255, 77, 77, 0.5) !important;
 }
 
-/* Inputs - Combined and forced */
-div[data-baseweb="input"] > div, 
-div[data-baseweb="select"] > div,
-div[data-baseweb="base-input"] > input,
-.stTextInput input, .stNumberInput input, .stTextArea textarea {
-    background-color: rgba(255, 255, 255, 0.1) !important;
+/* UNIVERSAL INPUT FIX - Extreme specificity */
+div[data-baseweb="input"], 
+div[data-baseweb="input"] > div,
+div[data-baseweb="base-input"],
+input[type="text"], 
+input[type="password"], 
+input[type="number"],
+textarea {
+    background-color: #1a1a2e !important;
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
+    background-image: none !important;
+}
+
+.stTextInput div[data-baseweb="base-input"],
+.stNumberInput div[data-baseweb="base-input"],
+.stSelectbox div[data-baseweb="select"] {
+    background-color: #1a1a2e !important;
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
     border-radius: 12px !important;
 }
 
-/* Specific fix for the "white background" issue when focused/typing */
-.stTextInput input:focus, .stNumberInput input:focus {
-    background-color: rgba(255, 255, 255, 0.15) !important;
+/* Force text color for all states */
+input, select, textarea {
     color: #ffffff !important;
-    border-color: #FF4D4D !important;
-    box-shadow: 0 0 0 2px rgba(255, 77, 77, 0.2) !important;
+    font-weight: 500 !important;
 }
 
-/* Label and help text */
+/* Placeholder visibility */
+::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Label and Text visibility */
 label, .stMarkdown, p, h1, h2, h3, span, [data-testid="stWidgetLabel"] p {
     color: #ffffff !important;
 }
