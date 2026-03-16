@@ -5,7 +5,9 @@ DB_NAME = "fitplan.db"
 
 # ---------- CONNECT ----------
 def get_connection():
-    return sqlite3.connect(DB_NAME, check_same_thread=False)
+    conn = sqlite3.connect(DB_NAME, check_same_thread=False)
+    conn.execute("PRAGMA foreign_keys = ON")
+    return conn
 
 
 # ---------- INIT TABLES ----------
@@ -30,7 +32,9 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         email TEXT,
         goal TEXT,
-        plan TEXT
+        plan TEXT,
+        created_at DATE DEFAULT CURRENT_DATE,
+        FOREIGN KEY(email) REFERENCES users(email) ON DELETE CASCADE
     )
     """)
 
@@ -39,9 +43,13 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         email TEXT,
         weight REAL,
-        day TEXT
+        created_at DATE DEFAULT CURRENT_DATE,
+        FOREIGN KEY(email) REFERENCES users(email) ON DELETE CASCADE
     )
     """)
+
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_workout_email ON workouts(email)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_weight_email ON weights(email)")
 
     conn.commit()
     conn.close()
@@ -55,16 +63,19 @@ def add_user(name, age, gender, email, password, goal):
 
     try:
         cursor.execute("""
-        INSERT INTO users VALUES(?,?,?,?,?,?)
+        INSERT INTO users(email,name,age,gender,password,goal)
+        VALUES(?,?,?,?,?,?)
         """, (email, name, age, gender, password, goal))
 
         conn.commit()
-        conn.close()
         return True
 
-    except:
-        conn.close()
+    except Exception as e:
+        print("DB ERROR:", e)
         return False
+
+    finally:
+        conn.close()
 
 
 # ---------- VERIFY USER ----------
@@ -80,7 +91,6 @@ def verify_user(email, password):
     user = cursor.fetchone()
 
     conn.close()
-
     return user
 
 
@@ -94,11 +104,10 @@ def get_user_profile(email):
     SELECT name, age, gender, goal FROM users WHERE email=?
     """, (email,))
 
-    data = cursor.fetchone()
+    profile = cursor.fetchone()
 
     conn.close()
-
-    return data
+    return profile
 
 
 # ---------- UPDATE PROFILE ----------
@@ -132,16 +141,35 @@ def save_workout(email, goal, plan):
     conn.close()
 
 
-# ---------- SAVE WEIGHT ----------
-def save_weight(email, weight, day):
+# ---------- GET WORKOUTS ----------
+def get_workouts(email):
 
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-    INSERT INTO weights(email, weight, day)
-    VALUES(?,?,?)
-    """, (email, weight, day))
+    SELECT goal, plan, created_at
+    FROM workouts
+    WHERE email=?
+    ORDER BY id DESC
+    """, (email,))
+
+    data = cursor.fetchall()
+
+    conn.close()
+    return data
+
+
+# ---------- SAVE WEIGHT ----------
+def save_weight(email, weight):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    INSERT INTO weights(email, weight)
+    VALUES(?,?)
+    """, (email, weight))
 
     conn.commit()
     conn.close()
