@@ -70,9 +70,31 @@ st.markdown("""
 .stTextInput>div>div>input, .stNumberInput>div>div>input, .stSelectbox>div>div {
     background: rgba(255, 255, 255, 0.07) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    color: white !important;
+    color: #ffffff !important;
     border-radius: 12px !important;
     padding: 12px !important;
+}
+
+/* Ensure labels are visible */
+label, .stMarkdown, p, h1, h2, h3, span {
+    color: #ffffff !important;
+}
+
+/* Fix for typed text visibility in inputs */
+input {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Selectbox text visibility */
+div[data-baseweb="select"] > div {
+    color: #ffffff !important;
+}
+
+/* Interaction focus */
+.stTextInput>div>div>input:focus {
+    border: 1px solid #FF4D4D !important;
+    background: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Tabs */
