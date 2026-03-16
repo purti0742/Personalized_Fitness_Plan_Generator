@@ -5,9 +5,14 @@ import os
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 def generate_workout(name, age, goal, level, equipment, bmi):
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        return "Error: GEMINI_API_KEY not found in environment. Please set it in Hugging Face Secrets."
+    
     try:
-        # Use the latest stable model
-        model = genai.GenerativeModel('gemini-1.5-flash-latest')
+        genai.configure(api_key=api_key)
+        # Standard model name
+        model = genai.GenerativeModel('gemini-1.5-flash')
         
         prompt = f"""
         You are a professional fitness coach. Provide a detailed 5-day workout plan for:
