@@ -66,36 +66,41 @@ st.markdown("""
     box-shadow: 0 6px 20px rgba(255, 77, 77, 0.5) !important;
 }
 
-/* Inputs */
-.stTextInput>div>div>input, .stNumberInput>div>div>input, .stSelectbox>div>div {
-    background: rgba(255, 255, 255, 0.07) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    color: #ffffff !important;
-    border-radius: 12px !important;
-    padding: 12px !important;
-}
-
-/* Ensure labels are visible */
-label, .stMarkdown, p, h1, h2, h3, span {
-    color: #ffffff !important;
-}
-
-/* Fix for typed text visibility in inputs */
-input {
+/* Inputs - Combined and forced */
+div[data-baseweb="input"] > div, 
+div[data-baseweb="select"] > div,
+div[data-baseweb="base-input"] > input,
+.stTextInput input, .stNumberInput input, .stTextArea textarea {
+    background-color: rgba(255, 255, 255, 0.1) !important;
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 12px !important;
 }
 
-/* Selectbox text visibility */
-div[data-baseweb="select"] > div {
+/* Specific fix for the "white background" issue when focused/typing */
+.stTextInput input:focus, .stNumberInput input:focus {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+    border-color: #FF4D4D !important;
+    box-shadow: 0 0 0 2px rgba(255, 77, 77, 0.2) !important;
+}
+
+/* Label and help text */
+label, .stMarkdown, p, h1, h2, h3, span, [data-testid="stWidgetLabel"] p {
     color: #ffffff !important;
 }
 
-/* Interaction focus */
-.stTextInput>div>div>input:focus {
-    border: 1px solid #FF4D4D !important;
-    background: rgba(255, 255, 255, 0.1) !important;
+/* Selectbox specific */
+div[data-baseweb="select"] {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px !important;
 }
+
+div[data-baseweb="select"] * {
+    color: #ffffff !important;
+}
+
 
 /* Tabs */
 .stTabs [data-baseweb="tab-list"] {
