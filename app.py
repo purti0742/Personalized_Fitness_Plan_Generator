@@ -6,7 +6,11 @@ import model
 import time
 
 # ---------------- INIT DB ----------------
-db.init_db()
+try:
+    db.init_db()
+except Exception as e:
+    st.error(f"Database Initialization Error: {e}")
+    st.stop()
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(
