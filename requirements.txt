@@ -2,7 +2,7 @@ streamlit
 sib-api-v3-sdk
 pyjwt
 python-dotenv
-google-generativeai
+huggingface_hub
 bcrypt
 pandas
 
