@@ -1,58 +1,53 @@
 import os
 import requests
-import json
 import time
 
 def generate_workout(name, age, goal, level, equipment, bmi):
-    # Get HF Token from environment secrets
     hf_token = os.getenv("HUGGINGFACE_TOKEN")
     
     if not hf_token:
-        return "Error: HUGGINGFACE_TOKEN not found. Please add it to your Hugging Face Space Settings > Secrets."
+        return "Error: HUGGINGFACE_TOKEN not found."
 
-    # Using the most stable Serverless Inference endpoint (OpenAI-compatible)
-    # This path is the new standard that replaces the old 410-Gone endpoint
-    api_url = "https://api-inference.huggingface.co/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {hf_token}",
-        "Content-Type": "application/json"
-    }
+    # Switch to the standard Inference API endpoint for better compatibility
+    API_URL = "https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-3B-Instruct"
+    headers = {"Authorization": f"Bearer {hf_token}"}
 
-    # Model ID - Llama-3.2-3B-Instruct is extremely reliable and 'warm' on the free tier
-    model_id = "meta-llama/Llama-3.2-3B-Instruct"
-
-    messages = [
-        {"role": "system", "content": "You are a professional fitness coach. Return ONLY the plan in Markdown. No filler."},
-        {"role": "user", "content": f"Create a 5-day workout for {name}. Goal: {goal}, Level: {level}, Equipment: {equipment}, BMI: {bmi}. Include Day headers and 3-4 exercises per day."}
-    ]
+    # Format the prompt clearly for the model
+    prompt = f"""<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+    You are a professional fitness coach. Return ONLY the plan in Markdown. No filler.<|eot_id|>
+    <|start_header_id|>user<|end_header_id|>
+    Create a 5-day workout for {name}. 
+    Goal: {goal}, Level: {level}, Equipment: {equipment}, BMI: {bmi}. 
+    Include Day headers and 3-4 exercises per day.<|eot_id|>
+    <|start_header_id|>assistant<|end_header_id|>"""
 
     payload = {
-        "model": model_id,
-        "messages": messages,
-        "max_tokens": 1200,
-        "temperature": 0.5,
-        "stream": False
+        "inputs": prompt,
+        "parameters": {
+            "max_new_tokens": 1000,
+            "temperature": 0.7,
+            "return_full_text": False
+        }
     }
 
-    try:
-        # We try up to 3 times if the model is loading
-        for attempt in range(3):
-            response = requests.post(api_url, headers=headers, json=payload, timeout=120)
+    for attempt in range(3):
+        try:
+            response = requests.post(API_URL, headers=headers, json=payload, timeout=30)
             
             if response.status_code == 200:
                 result = response.json()
-                if "choices" in result and len(result["choices"]) > 0:
-                    return result["choices"][0]["message"]["content"]
-                return f"Error: No content in response: {result}"
+                # The response format for this endpoint is usually a list of dicts
+                if isinstance(result, list) and len(result) > 0:
+                    return result[0].get('generated_text', 'No text generated.')
+                return str(result)
             
-            # If model is loading, wait and retry
-            elif response.status_code == 503:
-                time.sleep(15)
+            elif response.status_code == 503: # Model loading
+                time.sleep(20)
                 continue
             else:
-                break
-        
-        return f"Error: API returned status {response.status_code} - {response.text}"
-            
-    except Exception as e:
-        return f"Error: Connection failed: {str(e)}"
+                return f"API Error: {response.status_code} - {response.text}"
+                
+        except Exception as e:
+            return f"Connection failed: {str(e)}"
+
+    return "Model is taking too long to load. Please try again in a minute."
