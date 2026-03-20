@@ -9,8 +9,11 @@ def generate_workout(name, age, goal, level, equipment, bmi):
         return "Error: HUGGINGFACE_TOKEN not found."
 
     # Switch to the standard Inference API endpoint for better compatibility
-    API_URL = "https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-3B-Instruct"
-    headers = {"Authorization": f"Bearer {hf_token}"}
+    API_URL = "https://router.huggingface.co/hf-inference/models/meta-llama/Llama-3.2-3B-Instruct"
+    headers = {
+        "Authorization": f"Bearer {hf_token}",
+        "Content-Type": "application/json"
+    }
 
     # Format the prompt clearly for the model
     prompt = f"""<|begin_of_text|><|start_header_id|>system<|end_header_id|>
