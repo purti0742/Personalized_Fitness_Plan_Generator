@@ -7,7 +7,7 @@ def query_model(prompt):
 
         client = InferenceClient(
             model="mistralai/Mistral-7B-Instruct-v0.2",
-            token=HF_TOKEN
+            token=HF_TOKENN
         )
 
         response = client.chat_completion(
