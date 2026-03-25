@@ -364,7 +364,8 @@ elif st.session_state.page == "profile_setup":
             goal = st.selectbox("Primary Fitness Goal", ["Build Muscle", "Lose Weight", "Endurance", "Flexibility", "General Fitness"])
         
         if st.button("FINISH SETUP"):
-            db.update_profile(st.session_state.name, age, gender, goal, st.session_state.user_email)
+            # Added 'height' as the 4th argument
+            db.update_profile(st.session_state.name, age, gender, height, goal, st.session_state.user_email)
             st.session_state.age = age
             st.session_state.gender = gender
             st.session_state.goal = goal
@@ -491,7 +492,8 @@ elif st.session_state.page == "dashboard":
                                index=["Build Muscle", "Lose Weight", "Endurance", "Flexibility", "General Fitness"].index(st.session_state.goal))
 
         if st.button("UPDATE PROFILE"):
-            db.update_profile(new_name, new_age, st.session_state.gender, new_goal, st.session_state.user_email)
+            # Added 'new_height' as the 4th argument
+            db.update_profile(new_name, new_age, st.session_state.gender, new_height, new_goal, st.session_state.user_email)
             st.session_state.name = new_name
             st.session_state.age = new_age
             st.session_state.height = new_height
