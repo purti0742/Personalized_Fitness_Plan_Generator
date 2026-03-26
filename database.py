@@ -10,6 +10,7 @@ def get_connection():
 def init_db():
     conn = get_connection()
     cur = conn.cursor()
+    # USERS TABLE (Added food_pref and region)
     cur.execute("""
         CREATE TABLE IF NOT EXISTS users(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -20,9 +21,12 @@ def init_db():
             email TEXT UNIQUE,
             password BLOB,
             goal TEXT,
+            food_pref TEXT DEFAULT 'None',
+            region TEXT DEFAULT 'None',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    # WORKOUT TABLE
     cur.execute("""
         CREATE TABLE IF NOT EXISTS workouts(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,6 +36,7 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    # WEIGHT TABLE
     cur.execute("""
         CREATE TABLE IF NOT EXISTS weights(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,18 +45,38 @@ def init_db():
             date TEXT
         )
     """)
+    # WATER INTAKE TABLE
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS water_intake(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT,
+            ml INTEGER,
+            date TEXT
+        )
+    """)
+    # CHALLENGES TABLE
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS challenges(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT,
+            title TEXT,
+            start_date TEXT,
+            duration_days INTEGER,
+            status TEXT DEFAULT 'Active'
+        )
+    """)
     conn.commit()
     conn.close()
 
-def add_user(name, age, gender, height, email, password, goal):
+def add_user(name, age, gender, height, email, password, goal, food_pref='None', region='None'):
     try:
         conn = get_connection()
         cur = conn.cursor()
         hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
         cur.execute("""
-            INSERT INTO users(name, age, gender, height, email, password, goal)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (name, age, gender, height, email, hashed_pw, goal))
+            INSERT INTO users(name, age, gender, height, email, password, goal, food_pref, region)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (name, age, gender, height, email, hashed_pw, goal, food_pref, region))
         conn.commit()
         conn.close()
         return True
@@ -75,7 +100,7 @@ def get_user_profile(email):
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("""
-        SELECT name, age, gender, height, goal
+        SELECT name, age, gender, height, goal, food_pref, region
         FROM users
         WHERE email=?
     """, (email,))
@@ -83,14 +108,14 @@ def get_user_profile(email):
     conn.close()
     return data
 
-def update_profile(name, age, gender, height, goal, email):
+def update_profile(name, age, gender, height, goal, food_pref, region, email):
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("""
         UPDATE users
-        SET name=?, age=?, gender=?, height=?, goal=?
+        SET name=?, age=?, gender=?, height=?, goal=?, food_pref=?, region=?
         WHERE email=?
-    """, (name, age, gender, height, goal, email))
+    """, (name, age, gender, height, goal, food_pref, region, email))
     conn.commit()
     conn.close()
 
@@ -150,3 +175,29 @@ def get_last_weight(email):
     if data:
         return data[0]
     return None
+
+def save_water(email, ml, date):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("INSERT INTO water_intake(email, ml, date) VALUES (?, ?, ?)", (email, ml, date))
+    conn.commit()
+    conn.close()
+
+def get_water_history(email):
+    conn = get_connection()
+    df = pd.read_sql_query("SELECT date, SUM(ml) as total_ml FROM water_intake WHERE email=? GROUP BY date", conn, params=(email,))
+    conn.close()
+    return df
+
+def add_challenge(email, title, start_date, duration):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("INSERT INTO challenges(email, title, start_date, duration_days) VALUES (?, ?, ?, ?)", (email, title, start_date, duration))
+    conn.commit()
+    conn.close()
+
+def get_challenges(email):
+    conn = get_connection()
+    df = pd.read_sql_query("SELECT * FROM challenges WHERE email=?", conn, params=(email,))
+    conn.close()
+    return df
