@@ -1,28 +1,30 @@
 import os
 import requests
-import time
 
 def generate_workout(name, age, goal, level, equipment, bmi):
-    hf_token = os.getenv("HUGGINGFACE_TOKEN")
+    # 1. Pull the URL you saved in Hugging Face Secrets
+    NGROK_URL = os.getenv("NGROK_URL") 
     
-    if not hf_token:
-        return "Error: HUGGINGFACE_TOKEN not found in environment secrets."
+    if not NGROK_URL:
+        return "Error: NGROK_URL not found in Hugging Face Secrets. Please add it in Settings."
 
-    # Use the stable OpenAI-compatible router endpoint
-    API_URL = "https://router.huggingface.co/hf-inference/v1/chat/completions"
+    # 2. Point to the local LM Studio server endpoint
+    # We use /v1/chat/completions to match LM Studio's OpenAI-style API
+    API_URL = f"{NGROK_URL.rstrip('/')}/v1/chat/completions"
     
+    # 3. CRITICAL: Add the ngrok-skip header for the free tier
     headers = {
-        "Authorization": f"Bearer {hf_token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true" 
     }
 
-    # Use the 'messages' format - it's much more reliable with the new router
+    # 4. Create the request for your local Llama model
     payload = {
-        "model": "meta-llama/Llama-3.2-3B-Instruct",
+        "model": "llama-3.2-3b-instruct", 
         "messages": [
             {
                 "role": "system", 
-                "content": "You are a professional fitness coach. Return ONLY the 5-day workout plan in Markdown format. Do not include introductory text or signatures."
+                "content": "You are a professional fitness coach. Return ONLY a 5-day workout plan in Markdown format. Do not include introductory text."
             },
             {
                 "role": "user", 
@@ -33,28 +35,20 @@ def generate_workout(name, age, goal, level, equipment, bmi):
         "temperature": 0.7
     }
 
-    for attempt in range(3):
-        try:
-            # Increased timeout slightly for free tier reliability
-            response = requests.post(API_URL, headers=headers, json=payload, timeout=60)
+    try:
+        # 5. Send the request to your home computer
+        # Timeout is set high (180s) because local CPUs can take longer than cloud GPUs
+        response = requests.post(API_URL, headers=headers, json=payload, timeout=180)
+        
+        if response.status_code == 200:
+            result = response.json()
+            if "choices" in result and len(result["choices"]) > 0:
+                return result["choices"][0]["message"]["content"]
+            return "Error: Received an empty response from your local AI."
+        else:
+            return f"Server Error ({response.status_code}): Ensure LM Studio and ngrok are both running on your PC."
             
-            if response.status_code == 200:
-                result = response.json()
-                # Accessing the chat completions response structure
-                if "choices" in result and len(result["choices"]) > 0:
-                    return result["choices"][0]["message"]["content"]
-                return "Error: Unexpected response format from AI."
-            
-            # 503 means model is loading, 429 means rate limited
-            elif response.status_code in [503, 429]:
-                time.sleep(20)
-                continue
-            
-            # If still getting 404/Not Found, it might be the model ID in the router
-            else:
-                return f"API Error: {response.status_code} - {response.text}"
-                
-        except Exception as e:
-            return f"Connection failed: {str(e)}"
-
-    return "The AI coach is currently busy or loading. Please wait a moment and try again."
+    except requests.exceptions.Timeout:
+        return "The request timed out. Your computer is taking too long to process the plan."
+    except Exception as e:
+        return f"Connection Failed: Is your CMD window still open with ngrok? Error: {str(e)}"
