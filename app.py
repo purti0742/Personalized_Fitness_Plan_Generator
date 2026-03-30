@@ -333,7 +333,7 @@ elif st.session_state.page == "verify_signup":
             if entered == st.session_state.generated_otp:
                 data = st.session_state.temp_signup
                 # Initial signup with default age/gender - will be updated in set up
-                ok = db.add_user(data["name"], 20, "Other", data["email"], data["password"], "General Fitness")
+                ok = db.add_user(data["name"], 20, "Other", 170.0, data["email"], data["password"], "General Fitness")
                 if ok:
                     st.success("Welcome aboard! Let's set up your profile.")
                     st.session_state.user_email = data["email"]
