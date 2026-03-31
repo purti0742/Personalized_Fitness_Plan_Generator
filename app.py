@@ -239,7 +239,8 @@ elif st.session_state.page == "login":
                     st.session_state.token = create_jwt(email)
                     profile = db.get_user_profile(email)
                     if profile:
-                        st.session_state.name, st.session_state.age, st.session_state.gender, st.session_state.goal = profile
+                        # Added st.session_state.height to the list to catch all 5 values from the DB
+                        st.session_state.name, st.session_state.age, st.session_state.gender, st.session_state.height, st.session_state.goal = profile
                         st.session_state.page = "dashboard"
                     else:
                         st.session_state.page = "profile_setup" # Direct to setup if no profile
@@ -262,7 +263,8 @@ elif st.session_state.page == "login":
                     st.session_state.token = create_jwt(email)
                     profile = db.get_user_profile(email)
                     if profile:
-                        st.session_state.name, st.session_state.age, st.session_state.gender, st.session_state.goal = profile
+                        # Added st.session_state.height to the list to catch all 5 values from the DB
+                        st.session_state.name, st.session_state.age, st.session_state.gender, st.session_state.height, st.session_state.goal = profile
                         st.session_state.page = "dashboard"
                     else:
                         st.session_state.page = "profile_setup"
