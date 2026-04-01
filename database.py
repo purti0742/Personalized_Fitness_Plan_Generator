@@ -1,13 +1,18 @@
+import os
 from pymongo import MongoClient
 from datetime import datetime
 import bcrypt
 
 # ---------------- CONNECTION ----------------
-MONGO_URI = "mongodb://localhost:27017/"   # change if using Atlas
+MONGO_URI = os.getenv("MONGO_URI")  # 🔐 Get from Hugging Face Secrets
+
+if not MONGO_URI:
+    raise Exception("MONGO_URI not found. Please set it in Hugging Face Secrets.")
 
 client = MongoClient(MONGO_URI)
 db = client["fitplan_ai"]
 
+# Collections
 users_col = db["users"]
 weights_col = db["weights"]
 workouts_col = db["workouts"]
@@ -15,21 +20,22 @@ workouts_col = db["workouts"]
 
 # ---------------- INIT DB ----------------
 def init_db():
-    # MongoDB creates collections automatically
+    # MongoDB auto-creates collections
     pass
 
 
 # ---------------- PASSWORD HASH ----------------
 def hash_password(password):
-    return bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
 
 def check_password(password, hashed):
-    return bcrypt.checkpw(password.encode(), hashed)
+    return bcrypt.checkpw(password.encode('utf-8'), hashed)
 
 
 # ---------------- USER FUNCTIONS ----------------
 def add_user(name, age, gender, height, email, password, goal):
+    # Check if user already exists
     if users_col.find_one({"email": email}):
         return False
 
@@ -94,7 +100,6 @@ def get_weights(email):
     if not data:
         return None
 
-    # Convert to format usable by Streamlit chart
     return {
         "date": [d["date"] for d in data],
         "weight": [d["weight"] for d in data]
