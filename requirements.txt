@@ -7,3 +7,4 @@ bcrypt
 pandas
 requests
 pymongo
+dnspython
