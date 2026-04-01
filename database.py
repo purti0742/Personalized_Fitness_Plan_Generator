@@ -22,6 +22,10 @@ workouts_col = db["workouts"]
 def init_db():
     # MongoDB auto-creates collections
     pass
+    import certifi
+
+# When defining your client:
+client = pymongo.MongoClient("your_connection_string", tlsCAFile=certifi.where())
 
 
 # ---------------- PASSWORD HASH ----------------
