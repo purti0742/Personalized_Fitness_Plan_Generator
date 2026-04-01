@@ -28,11 +28,9 @@ def init_db():
 
 # ---------------- PASSWORD HASH ----------------
 def hash_password(password):
-    # Ensure password is bytes for bcrypt
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
 def check_password(password, hashed):
-    # 'hashed' from MongoDB will be in bytes, which bcrypt needs
     return bcrypt.checkpw(password.encode('utf-8'), hashed)
 
 # ---------------- USER FUNCTIONS ----------------
