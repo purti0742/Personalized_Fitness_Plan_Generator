@@ -22,6 +22,9 @@ db = client["fitplan_ai"]
 users_col = db["users"]
 weights_col = db["weights"]
 workouts_col = db["workouts"]
+# ---------------- INIT DB ----------------
+def init_db():
+    pass
 
 # ---------------- PASSWORD HASH ----------------
 def hash_password(password):
