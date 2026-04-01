@@ -349,7 +349,6 @@ elif st.session_state.page == "verify_signup":
         st.markdown('</div>', unsafe_allow_html=True)
 
 # ================= PROFILE SETUP =================
-# ================= PROFILE SETUP =================
 elif st.session_state.page == "profile_setup":
     _, main_col, _ = st.columns([1, 2, 1])
 
@@ -417,6 +416,7 @@ elif st.session_state.page == "dashboard":
     head_col1, head_col2 = st.columns([4,1])
     with head_col1:
         st.markdown(f"### 💪 Welcome, {st.session_state.name}")
+        st.write(f"📧 Email: {st.session_state.user_email}")
     with head_col2:
         if st.button("LOGOUT"):
             st.session_state.clear()
