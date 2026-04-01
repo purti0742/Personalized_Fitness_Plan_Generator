@@ -365,16 +365,31 @@ elif st.session_state.page == "profile_setup":
             weight = st.number_input("Weight (kg)", 30, 300, 75)
             goal = st.selectbox("Primary Fitness Goal", ["Build Muscle", "Lose Weight", "Endurance", "Flexibility", "General Fitness"])
         
-        if st.button("FINISH SETUP"):
-            # Added 'height' as the 4th argument to match database.py
-            db.update_profile(st.session_state.name, age, gender, height, goal, st.session_state.user_email)
-            st.session_state.age = age
-            st.session_state.gender = gender
-            st.session_state.goal = goal
-            st.session_state.height = height
-            st.session_state.weight = weight
-            st.session_state.page = "dashboard"
-            st.rerun()
+       if st.button("FINISH SETUP"):
+    # Update profile in DB
+    db.update_profile(
+        st.session_state.name,
+        age,
+        gender,
+        height,
+        goal,
+        st.session_state.user_email
+    )
+
+    # Save initial weight ✅ (ADD HERE)
+    today = time.strftime("%Y-%m-%d")
+    db.save_weight(st.session_state.user_email, weight, today)
+
+    # Update session state
+    st.session_state.age = age
+    st.session_state.gender = gender
+    st.session_state.goal = goal
+    st.session_state.height = height
+    st.session_state.weight = weight
+
+    # Redirect
+    st.session_state.page = "dashboard"
+    st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
 # ================= DASHBOARD =================
