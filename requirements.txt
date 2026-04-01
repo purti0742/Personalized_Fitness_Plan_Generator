@@ -6,5 +6,7 @@ huggingface_hub
 bcrypt
 pandas
 requests
-pymongo
 dnspython
+pymongo[srv]
+certifi
+
