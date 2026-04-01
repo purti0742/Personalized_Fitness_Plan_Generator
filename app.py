@@ -349,47 +349,65 @@ elif st.session_state.page == "verify_signup":
         st.markdown('</div>', unsafe_allow_html=True)
 
 # ================= PROFILE SETUP =================
+# ================= PROFILE SETUP =================
 elif st.session_state.page == "profile_setup":
-    _, main_col, _ = st.columns([1,2,1])
+    _, main_col, _ = st.columns([1, 2, 1])
+
     with main_col:
         st.markdown('<div class="glass-card fade-in">', unsafe_allow_html=True)
         st.markdown('<h2>Optimize Your Experience</h2>', unsafe_allow_html=True)
         st.write("Help us tailor the perfect workout plans for you.")
-        
+
         col1, col2 = st.columns(2)
+
+        # LEFT COLUMN
         with col1:
             age = st.number_input("Age", 10, 100, 25)
-            gender = st.selectbox("Gender", ["Male", "Female", "Non-binary", "Prefer not to say"])
+            gender = st.selectbox(
+                "Gender",
+                ["Male", "Female", "Non-binary", "Prefer not to say"]
+            )
             height = st.number_input("Height (cm)", 100, 250, 175)
+
+        # RIGHT COLUMN
         with col2:
             weight = st.number_input("Weight (kg)", 30, 300, 75)
-            goal = st.selectbox("Primary Fitness Goal", ["Build Muscle", "Lose Weight", "Endurance", "Flexibility", "General Fitness"])
-        
-       if st.button("FINISH SETUP"):
-    # Update profile in DB
-    db.update_profile(
-        st.session_state.name,
-        age,
-        gender,
-        height,
-        goal,
-        st.session_state.user_email
-    )
+            goal = st.selectbox(
+                "Primary Fitness Goal",
+                ["Build Muscle", "Lose Weight", "Endurance", "Flexibility", "General Fitness"]
+            )
 
-    # Save initial weight ✅ (ADD HERE)
-    today = time.strftime("%Y-%m-%d")
-    db.save_weight(st.session_state.user_email, weight, today)
+        # ✅ BUTTON (CORRECT INDENTATION)
+        if st.button("FINISH SETUP"):
 
-    # Update session state
-    st.session_state.age = age
-    st.session_state.gender = gender
-    st.session_state.goal = goal
-    st.session_state.height = height
-    st.session_state.weight = weight
+            # Update profile
+            db.update_profile(
+                st.session_state.name,
+                age,
+                gender,
+                height,
+                goal,
+                st.session_state.user_email
+            )
 
-    # Redirect
-    st.session_state.page = "dashboard"
-    st.rerun()
+            # Save initial weight
+            import time
+            today = time.strftime("%Y-%m-%d")
+            db.save_weight(st.session_state.user_email, weight, today)
+
+            # Update session
+            st.session_state.age = age
+            st.session_state.gender = gender
+            st.session_state.goal = goal
+            st.session_state.height = height
+            st.session_state.weight = weight
+
+            st.success("Profile setup complete! 🎉")
+
+            # Redirect
+            st.session_state.page = "dashboard"
+            st.rerun()
+
         st.markdown('</div>', unsafe_allow_html=True)
 
 # ================= DASHBOARD =================
