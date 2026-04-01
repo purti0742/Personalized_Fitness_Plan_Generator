@@ -6,4 +6,4 @@ huggingface_hub
 bcrypt
 pandas
 requests
-
+pymongo
