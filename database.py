@@ -1,209 +1,111 @@
-import sqlite3
-import pandas as pd
+from pymongo import MongoClient
+from datetime import datetime
 import bcrypt
 
-DB_NAME = "fitplan.db"
-
-
 # ---------------- CONNECTION ----------------
-def get_connection():
-    conn = sqlite3.connect(DB_NAME, check_same_thread=False)
-    conn.row_factory = sqlite3.Row   # enables column names
-    return conn
+MONGO_URI = "mongodb://localhost:27017/"   # change if using Atlas
 
-# ---------------- INIT DATABASE ----------------
+client = MongoClient(MONGO_URI)
+db = client["fitplan_ai"]
+
+users_col = db["users"]
+weights_col = db["weights"]
+workouts_col = db["workouts"]
+
+
+# ---------------- INIT DB ----------------
 def init_db():
-    conn = get_connection()
-    cur = conn.cursor()
+    # MongoDB creates collections automatically
+    pass
 
-    # USERS TABLE
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS users(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            age INTEGER,
-            gender TEXT,
-            height REAL,
-            email TEXT UNIQUE,
-            password BLOB,
-            goal TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
 
-    # WORKOUT TABLE
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS workouts(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT,
-            focus TEXT,
-            plan TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
+# ---------------- PASSWORD HASH ----------------
+def hash_password(password):
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt())
 
-    # WEIGHT TABLE
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS weights(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT,
-            weight REAL,
-            date TEXT
-        )
-    """)
 
-    # ✅ ADD INDEXES HERE
-    cur.execute("CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)")
-    cur.execute("CREATE INDEX IF NOT EXISTS idx_weights_email ON weights(email)")
-    cur.execute("CREATE INDEX IF NOT EXISTS idx_workouts_email ON workouts(email)")
+def check_password(password, hashed):
+    return bcrypt.checkpw(password.encode(), hashed)
 
-    conn.commit()
-    conn.close()
 
-# ---------------- ADD USER ----------------
+# ---------------- USER FUNCTIONS ----------------
 def add_user(name, age, gender, height, email, password, goal):
-    try:
-        hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-
-        with get_connection() as conn:
-            cur = conn.cursor()
-
-            cur.execute("""
-                INSERT INTO users(name, age, gender, height, email, password, goal)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, (name, age, gender, height, email, hashed_pw, goal))
-
-            conn.commit()
-
-        return True
-
-    except Exception as e:
-        import traceback
-        print(traceback.format_exc())
+    if users_col.find_one({"email": email}):
         return False
 
-# ---------------- VERIFY USER ----------------
+    users_col.insert_one({
+        "name": name,
+        "age": age,
+        "gender": gender,
+        "height": height,
+        "email": email,
+        "password": hash_password(password),
+        "goal": goal,
+        "created_at": datetime.utcnow()
+    })
+    return True
+
+
 def verify_user(email, password):
-    with get_connection() as conn:
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM users WHERE email=?", (email,))
-        user = cur.fetchone()
-
-    if user:
-        stored_pw = user["password"]
-        if bcrypt.checkpw(password.encode(), stored_pw):
-            return dict(user)
-
+    user = users_col.find_one({"email": email})
+    if user and check_password(password, user["password"]):
+        return user
     return None
 
 
-# ---------------- GET PROFILE ----------------
 def get_user_profile(email):
-    conn = get_connection()
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT name, age, gender, height, goal
-        FROM users
-        WHERE email=?
-    """, (email,))
-
-    data = cur.fetchone()
-    conn.close()
-
-    return data
+    user = users_col.find_one({"email": email})
+    if user:
+        return (
+            user.get("name"),
+            user.get("age"),
+            user.get("gender"),
+            user.get("height"),
+            user.get("goal")
+        )
+    return None
 
 
-# ---------------- UPDATE PROFILE ----------------
 def update_profile(name, age, gender, height, goal, email):
-    with get_connection() as conn:
-        cur = conn.cursor()
-
-        cur.execute("""
-            UPDATE users
-            SET name=?, age=?, gender=?, height=?, goal=?
-            WHERE email=?
-        """, (name, age, gender, height, goal, email))
-
-        conn.commit()
-
-
-# ---------------- SAVE WORKOUT ----------------
-def save_workout(email, focus, plan):
-    with get_connection() as conn:
-        cur = conn.cursor()
-
-        cur.execute("""
-            INSERT INTO workouts(email, focus, plan)
-            VALUES (?, ?, ?)
-        """, (email, focus, plan))
-
-        conn.commit()
-
-# ---------------- GET WORKOUT HISTORY ----------------
-def get_workouts(email):
-    conn = get_connection()
-
-    df = pd.read_sql_query(
-        "SELECT focus, plan, created_at FROM workouts WHERE email=? ORDER BY created_at DESC",
-        conn,
-        params=(email,)
+    users_col.update_one(
+        {"email": email},
+        {"$set": {
+            "name": name,
+            "age": age,
+            "gender": gender,
+            "height": height,
+            "goal": goal
+        }}
     )
 
-    conn.close()
-    return df
 
-
-# ---------------- SAVE WEIGHT ----------------
+# ---------------- WEIGHT TRACKING ----------------
 def save_weight(email, weight, date):
-    with get_connection() as conn:
-        cur = conn.cursor()
+    weights_col.insert_one({
+        "email": email,
+        "weight": weight,
+        "date": date
+    })
 
-        # Prevent duplicate same-day entry
-        cur.execute("DELETE FROM weights WHERE email=? AND date=?", (email, date))
 
-        cur.execute("""
-            INSERT INTO weights(email, weight, date)
-            VALUES (?, ?, ?)
-        """, (email, weight, date))
-
-        conn.commit()
-
-# ---------------- GET WEIGHT HISTORY ----------------
 def get_weights(email):
-    conn = get_connection()
+    data = list(weights_col.find({"email": email}).sort("date", 1))
 
-    df = pd.read_sql_query(
-        "SELECT date, weight FROM weights WHERE email=? ORDER BY date",
-        conn,
-        params=(email,)
-    )
-
-    conn.close()
-
-    if df.empty:
+    if not data:
         return None
 
-    df = df.set_index("date")
-    return df
+    # Convert to format usable by Streamlit chart
+    return {
+        "date": [d["date"] for d in data],
+        "weight": [d["weight"] for d in data]
+    }
 
 
-# ---------------- GET LAST WEIGHT ----------------
-def get_last_weight(email):
-    conn = get_connection()
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT weight FROM weights
-        WHERE email=?
-       ORDER BY datetime(date) DESC
-    """, (email,))
-
-    data = cur.fetchone()
-    conn.close()
-
-    if data:
-        return data[0]
-
-    return None
-    
+# ---------------- WORKOUTS ----------------
+def save_workout(email, goal, plan):
+    workouts_col.insert_one({
+        "email": email,
+        "goal": goal,
+        "plan": plan,
+        "created_at": datetime.utcnow()
+    })
