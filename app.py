@@ -228,14 +228,20 @@ elif st.session_state.page == "login":
         st.markdown('<h2 style="text-align: center; margin-bottom: 2rem;">Welcome Back</h2>', unsafe_allow_html=True)
 
         method = st.radio("Access Method", ["Password", "OTP"], horizontal=True)
-        email = st.text_input("Email Address", placeholder="name@example.com")
-
+       email = st.text_input(
+    "Email Address",
+    value=st.session_state.get("saved_email", ""),
+    placeholder="name@example.com"
+)
         if method == "Password":
             password = st.text_input("Password", type="password", placeholder="••••••••")
             if st.button("CONTINUE"):
                 user = db.verify_user(email, password)
                 if user:
                     st.session_state.user_email = email
+                    if user:
+                        st.session_state.user_email = email
+                         st.session_state.saved_email = email  # ⭐ IMPORTANT
                     st.session_state.token = create_jwt(email)
                     profile = db.get_user_profile(email)
                     if profile:
@@ -418,8 +424,14 @@ elif st.session_state.page == "dashboard":
         st.markdown(f"### 💪 Welcome, {st.session_state.name}")
         st.write(f"📧 Email: {st.session_state.user_email}")
     with head_col2:
-        if st.button("LOGOUT"):
-            st.session_state.clear()
+     if st.button("LOGOUT"):
+          saved_email = st.session_state.get("saved_email")
+
+          st.session_state.clear()
+
+          if saved_email:
+           st.session_state.saved_email = saved_email
+
             st.session_state.page = "landing"
             st.rerun()
 
