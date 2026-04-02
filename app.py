@@ -424,7 +424,7 @@ elif st.session_state.page == "dashboard":
     with head_col1:
         st.markdown(f"### 💪 Welcome, {st.session_state.name}")
         st.write(f"📧 Email: {st.session_state.user_email}")
-  with head_col2:
+     with head_col2:
     if st.button("LOGOUT"):
         saved_email = st.session_state.get("saved_email")
 
