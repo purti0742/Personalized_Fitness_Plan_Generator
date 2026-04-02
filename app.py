@@ -195,28 +195,42 @@ for k,v in defaults.items():
         st.session_state[k] = v
 
 # ================= LANDING PAGE =================
-if st.session_state.page == "landing":
-    st.markdown('<div class="fade-in">', unsafe_allow_html=True)
-    
-    _, col, _ = st.columns([1,2,1])
-    
-    with col:
-        st.markdown("<br><br>", unsafe_allow_html=True)
-        st.image("https://cdn-icons-png.flaticon.com/512/2964/2964514.png", width=120)
-        st.markdown('<h1 class="hero-text">FIT EVERYWHERE</h1>', unsafe_allow_html=True)
-        st.markdown('<p class="sub-hero">Your Intelligent AI-Powered Fitness Companion. Personalized plans, real-time tracking, and expert guidance.</p>', unsafe_allow_html=True)
-        
-        btn_col1, btn_col2 = st.columns(2)
-        with btn_col1:
-            if st.button("GET STARTED"):
-                st.session_state.page = "signup"
+elif st.session_state.page == "login":
+
+    _, main_col, _ = st.columns([1,1.5,1])
+
+    with main_col:
+        st.markdown('<div class="glass-card fade-in">', unsafe_allow_html=True)
+        st.markdown('<h2 style="text-align: center;">Welcome Back</h2>', unsafe_allow_html=True)
+
+        # ✅ Cookie email load
+        saved_email = cookies.get("email", "")
+
+        email = st.text_input(
+            "Email Address",
+            value=saved_email,
+            placeholder="name@example.com"
+        )
+
+        password = st.text_input("Password", type="password")
+
+        if st.button("LOGIN"):
+            user = db.verify_user(email, password)
+
+            if user:
+                st.session_state.user_email = email
+
+                # ✅ Save email in cookies
+                cookies["email"] = email
+                cookies.save()
+
+                st.success("Login successful!")
+                st.session_state.page = "dashboard"
                 st.rerun()
-        with btn_col2:
-            if st.button("LOG IN", key="landing_login"):
-                st.session_state.page = "login"
-                st.rerun()
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+            else:
+                st.error("Invalid email or password")
+
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # ================= LOGIN =================
 elif st.session_state.page == "login":
