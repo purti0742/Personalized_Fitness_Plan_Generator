@@ -424,17 +424,17 @@ elif st.session_state.page == "dashboard":
     with head_col1:
         st.markdown(f"### 💪 Welcome, {st.session_state.name}")
         st.write(f"📧 Email: {st.session_state.user_email}")
-    with head_col2:
-     if st.button("LOGOUT"):
+  with head_col2:
+    if st.button("LOGOUT"):
         saved_email = st.session_state.get("saved_email")
 
-    st.session_state.clear()
+        st.session_state.clear()
 
-    if saved_email:
-        st.session_state.saved_email = saved_email
+        if saved_email:
+            st.session_state.saved_email = saved_email
 
-       st.session_state.page = "landing"
-       st.rerun()
+        st.session_state.page = "landing"
+        st.rerun()
     tab1, tab2, tab3, tab4 = st.tabs(
         ["📊 Overview", "🔥 Workout Generator", "⚖️ Progress Tracker", "👤 Profile"]
     )
