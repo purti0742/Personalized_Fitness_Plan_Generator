@@ -226,14 +226,16 @@ elif st.session_state.page == "login":
 
     with main_col:
         st.markdown('<div class="glass-card fade-in">', unsafe_allow_html=True)
-        st.markdown('<h2 style="text-align: center; margin-bottom: 2rem;">Welcome Back</h2>', unsafe_allow_html=True)
+        st.markdown('<h2 style="text-align: center;">Welcome Back</h2>', unsafe_allow_html=True)
 
-          method = st.radio("Access Method", ["Password", "OTP"], horizontal=True)
-          email = st.text_input(
-              "Email Address",
-              value=load_email(),   # ✅ auto-fill email
-              placeholder="name@example.com")
+        # ✅ CORRECT INDENT (4 spaces inside 'with')
+        method = st.radio("Access Method", ["Password", "OTP"], horizontal=True)
 
+        email = st.text_input(
+            "Email Address",
+            value=load_email(),
+            placeholder="name@example.com"
+        )
         if method == "Password":
             password = st.text_input("Password", type="password", placeholder="••••••••")
             if st.button("CONTINUE"):
