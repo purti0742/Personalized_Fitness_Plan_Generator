@@ -361,12 +361,13 @@ elif st.session_state.page == "verify_signup":
                 # Added 170.0 as a default height to fix the argument count
                 ok = db.add_user( data["name"], 20, "Other", 170.0, data["email"], data["password"], "General Fitness")
                 if ok:
-                    save_email(data["email"])   # ✅ SAVE EMAIL AFTER SIGNUP
-                     st.success("Welcome aboard! Let's set up your profile.")
-                     st.session_state.user_email = data["email"]
-                     st.session_state.name = data["name"]
-                     st.session_state.page = "profile_setup"
-                     st.rerun()
+                    save_email(data["email"])   # ✅ save email
+
+                    st.success("Welcome aboard! Let's set up your profile.")
+                    st.session_state.user_email = data["email"]
+                    st.session_state.name = data["name"]
+                    st.session_state.page = "profile_setup"
+                    st.rerun()
                 else:
                     st.error("Registration failed. Email might be in use.")
             else:
