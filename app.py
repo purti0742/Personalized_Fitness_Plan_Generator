@@ -228,7 +228,6 @@ elif st.session_state.page == "login":
         st.markdown('<div class="glass-card fade-in">', unsafe_allow_html=True)
         st.markdown('<h2 style="text-align: center;">Welcome Back</h2>', unsafe_allow_html=True)
 
-        # ✅ CORRECT INDENT (4 spaces inside 'with')
         method = st.radio("Access Method", ["Password", "OTP"], horizontal=True)
 
         email = st.text_input(
@@ -236,56 +235,70 @@ elif st.session_state.page == "login":
             value=load_email(),
             placeholder="name@example.com"
         )
+
+        # ================= PASSWORD LOGIN =================
         if method == "Password":
             password = st.text_input("Password", type="password", placeholder="••••••••")
+
             if st.button("CONTINUE"):
-    user = db.verify_user(email, password)
+                user = db.verify_user(email, password)
 
-    if user:   # ✅ SAME LEVEL AS ABOVE LINE
-        save_email(email)
+                if user:
+                    save_email(email)  # ✅ save email
 
-        st.session_state.user_email = email
-        st.session_state.token = create_jwt(email)
+                    st.session_state.user_email = email
+                    st.session_state.token = create_jwt(email)
 
-        profile = db.get_user_profile(email)
+                    profile = db.get_user_profile(email)
 
-        if profile:
-            st.session_state.name, st.session_state.age, st.session_state.gender, st.session_state.height, st.session_state.goal = profile
-            st.session_state.page = "dashboard"
-        else:
-            st.session_state.page = "profile_setup"
+                    if profile:
+                        st.session_state.name, st.session_state.age, st.session_state.gender, st.session_state.height, st.session_state.goal = profile
+                        st.session_state.page = "dashboard"
+                    else:
+                        st.session_state.page = "profile_setup"
 
-        st.rerun()
-    else:
-        st.error("Authentication failed. Check credentials.")
+                    st.rerun()
+                else:
+                    st.error("Authentication failed. Check credentials.")
+
+        # ================= OTP LOGIN =================
         else:
             if st.button("SEND OTP"):
                 otp = str(random.randint(100000, 999999))
                 st.session_state.generated_otp = otp
+
                 if send_otp_via_brevo(email, otp):
                     st.success("OTP sent to your email!")
                 else:
                     st.error("Failed to send OTP. Try again.")
 
             entered = st.text_input("Verification Code", placeholder="123456")
+
             if st.button("VERIFY"):
                 if entered == st.session_state.generated_otp:
+                    save_email(email)  # ✅ save email here also
+
                     st.session_state.user_email = email
                     st.session_state.token = create_jwt(email)
+
                     profile = db.get_user_profile(email)
+
                     if profile:
-                        st.session_state.name, st.session_state.age, st.session_state.gender, st.session_state.goal = profile
+                        st.session_state.name, st.session_state.age, st.session_state.gender, st.session_state.height, st.session_state.goal = profile
                         st.session_state.page = "dashboard"
                     else:
                         st.session_state.page = "profile_setup"
+
                     st.rerun()
                 else:
                     st.error("Invalid verification code.")
 
         st.markdown("<hr style='opacity: 0.1'>", unsafe_allow_html=True)
+
         if st.button("Need an account? Sign Up"):
             st.session_state.page = "signup"
             st.rerun()
+
         if st.button("← Back to Home"):
             st.session_state.page = "landing"
             st.rerun()
