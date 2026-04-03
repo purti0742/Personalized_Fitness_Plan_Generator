@@ -520,12 +520,20 @@ elif st.session_state.page == "dashboard":
                                index=["Build Muscle", "Lose Weight", "Endurance", "Flexibility", "General Fitness"].index(st.session_state.goal))
 
         if st.button("UPDATE PROFILE"):
-            # Added 'height' as the 4th argument to match database.py
-             db.update_profile(new_name, new_age, st.session_state.gender, new_height, new_goal, st.session_state.user_email)
-            st.session_state.name = new_name
-            st.session_state.age = new_age
-            st.session_state.height = new_height
-            st.session_state.weight = new_weight
-            st.session_state.goal = new_goal
-            st.success("Profile updated successfully!")
+           db.update_profile(
+              new_name,
+              new_age,
+              st.session_state.gender,
+              new_height,
+              new_goal,
+             st.session_state.user_email
+           )
+
+           st.session_state.name = new_name
+           st.session_state.age = new_age
+           st.session_state.height = new_height
+           st.session_state.weight = new_weight
+           st.session_state.goal = new_goal
+
+           st.success("Profile updated successfully!")
         st.markdown('</div>', unsafe_allow_html=True)
