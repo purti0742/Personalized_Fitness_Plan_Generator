@@ -69,7 +69,7 @@ def get_user_profile(email):
         )
     return None
 
-def update_profile(name, age, gender, height, goal, email):
+def update_profile(name, age, gender, height,weight, goal, email):
     users_col.update_one(
         {"email": email},
         {"$set": {
@@ -77,6 +77,7 @@ def update_profile(name, age, gender, height, goal, email):
             "age": age,
             "gender": gender,
             "height": height,
+            "weight": weight,
             "goal": goal
         }}
     )
