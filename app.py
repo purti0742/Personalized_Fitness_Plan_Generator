@@ -2,6 +2,7 @@ import streamlit as st
 import random
 import database as db
 from auth import create_jwt, verify_jwt, send_otp_via_brevo
+from remember import save_email, load_email
 import model
 import time
 
@@ -228,23 +229,28 @@ elif st.session_state.page == "login":
         st.markdown('<h2 style="text-align: center; margin-bottom: 2rem;">Welcome Back</h2>', unsafe_allow_html=True)
 
         method = st.radio("Access Method", ["Password", "OTP"], horizontal=True)
-        email = st.text_input("Email Address", placeholder="name@example.com")
+         email = st.text_input(
+           "Email Address",
+              value=load_email(),   # ✅ auto-fill email
+             placeholder="name@example.com")
 
         if method == "Password":
             password = st.text_input("Password", type="password", placeholder="••••••••")
             if st.button("CONTINUE"):
                 user = db.verify_user(email, password)
-                if user:
+               if user:
+                    save_email(email)   # ✅ SAVE EMAIL AFTER LOGIN
                     st.session_state.user_email = email
                     st.session_state.token = create_jwt(email)
                     profile = db.get_user_profile(email)
+            
                     if profile:
-                        # Added st.session_state.height to the list to catch all 5 values from the DB
                         st.session_state.name, st.session_state.age, st.session_state.gender, st.session_state.height, st.session_state.goal = profile
                         st.session_state.page = "dashboard"
                     else:
-                        st.session_state.page = "profile_setup" # Direct to setup if no profile
-                    st.rerun()
+                        st.session_state.page = "profile_setup"
+
+                     st.rerun()
                 else:
                     st.error("Authentication failed. Check credentials.")
         else:
@@ -337,11 +343,12 @@ elif st.session_state.page == "verify_signup":
                 # Added 170.0 as a default height to fix the argument count
                 ok = db.add_user( data["name"], 20, "Other", 170.0, data["email"], data["password"], "General Fitness")
                 if ok:
-                    st.success("Welcome aboard! Let's set up your profile.")
-                    st.session_state.user_email = data["email"]
-                    st.session_state.name = data["name"]
-                    st.session_state.page = "profile_setup"
-                    st.rerun()
+                    save_email(data["email"])   # ✅ SAVE EMAIL AFTER SIGNUP
+                     st.success("Welcome aboard! Let's set up your profile.")
+                     st.session_state.user_email = data["email"]
+                     st.session_state.name = data["name"]
+                     st.session_state.page = "profile_setup"
+                     st.rerun()
                 else:
                     st.error("Registration failed. Email might be in use.")
             else:
@@ -495,7 +502,7 @@ elif st.session_state.page == "dashboard":
 
         if st.button("UPDATE PROFILE"):
             # Added 'height' as the 4th argument to match database.py
-            db.update_profile(st.session_state.name, age, gender, height, goal, st.session_state.user_email)
+             db.update_profile(new_name, new_age, st.session_state.gender, new_height, new_goal, st.session_state.user_email)
             st.session_state.name = new_name
             st.session_state.age = new_age
             st.session_state.height = new_height
