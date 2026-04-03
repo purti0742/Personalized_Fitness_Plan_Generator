@@ -231,8 +231,8 @@ elif st.session_state.page == "login":
         method = st.radio("Access Method", ["Password", "OTP"], horizontal=True)
          email = st.text_input(
            "Email Address",
-              value=load_email(),   # ✅ auto-fill email
-             placeholder="name@example.com")
+          value=load_email(),   # ✅ auto-fill email
+          placeholder="name@example.com")
 
         if method == "Password":
             password = st.text_input("Password", type="password", placeholder="••••••••")
