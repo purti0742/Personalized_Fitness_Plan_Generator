@@ -239,22 +239,25 @@ elif st.session_state.page == "login":
         if method == "Password":
             password = st.text_input("Password", type="password", placeholder="••••••••")
             if st.button("CONTINUE"):
-                user = db.verify_user(email, password)
-               if user:
-                    save_email(email)   # ✅ SAVE EMAIL AFTER LOGIN
-                    st.session_state.user_email = email
-                    st.session_state.token = create_jwt(email)
-                    profile = db.get_user_profile(email)
-            
-                    if profile:
-                        st.session_state.name, st.session_state.age, st.session_state.gender, st.session_state.height, st.session_state.goal = profile
-                        st.session_state.page = "dashboard"
-                    else:
-                        st.session_state.page = "profile_setup"
+    user = db.verify_user(email, password)
 
-                     st.rerun()
-                else:
-                    st.error("Authentication failed. Check credentials.")
+    if user:   # ✅ SAME LEVEL AS ABOVE LINE
+        save_email(email)
+
+        st.session_state.user_email = email
+        st.session_state.token = create_jwt(email)
+
+        profile = db.get_user_profile(email)
+
+        if profile:
+            st.session_state.name, st.session_state.age, st.session_state.gender, st.session_state.height, st.session_state.goal = profile
+            st.session_state.page = "dashboard"
+        else:
+            st.session_state.page = "profile_setup"
+
+        st.rerun()
+    else:
+        st.error("Authentication failed. Check credentials.")
         else:
             if st.button("SEND OTP"):
                 otp = str(random.randint(100000, 999999))
