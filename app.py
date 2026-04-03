@@ -525,6 +525,7 @@ elif st.session_state.page == "dashboard":
               new_age,
               st.session_state.gender,
               new_height,
+              new_weight,
               new_goal,
              st.session_state.user_email
            )
