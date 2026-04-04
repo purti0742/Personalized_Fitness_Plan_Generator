@@ -252,7 +252,7 @@ elif st.session_state.page == "login":
                     profile = db.get_user_profile(email)
 
                     if profile:
-                        st.session_state.name, st.session_state.age, st.session_state.gender, st.session_state.height, st.session_state.goal = profile
+                        st.session_state.name, st.session_state.age, st.session_state.gender, st.session_state.height, st.session_state.weight, st.session_state.goal = profile
                         st.session_state.page = "dashboard"
                     else:
                         st.session_state.page = "profile_setup"
