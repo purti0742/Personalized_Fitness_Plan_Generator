@@ -393,7 +393,7 @@ elif st.session_state.page == "profile_setup":
         
         if st.button("FINISH SETUP"):
             # Added 'height' as the 4th argument to match database.py
-            db.update_profile(st.session_state.name, age, gender, height, goal, st.session_state.user_email)
+            db.update_profile(st.session_state.name, age, gender, height,weight, goal, st.session_state.user_email)
             st.session_state.age = age
             st.session_state.gender = gender
             st.session_state.goal = goal
