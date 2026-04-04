@@ -44,6 +44,7 @@ def add_user(name, age, gender, height, email, password, goal):
         "age": age,
         "gender": gender,
         "height": height,
+        " weight":weight,
         "email": email,
         "password": hash_password(password),
         "goal": goal,
@@ -65,6 +66,7 @@ def get_user_profile(email):
             user.get("age"),
             user.get("gender"),
             user.get("height"),
+            user.get("weight"),
             user.get("goal")
         )
     return None
