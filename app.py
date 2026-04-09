@@ -284,7 +284,8 @@ elif st.session_state.page == "login":
                     profile = db.get_user_profile(email)
 
                     if profile:
-                        st.session_state.name, st.session_state.age, st.session_state.gender, st.session_state.height, st.session_state.goal = profile
+                        # Ensure this matches the 6 values returned by get_user_profile
+                        st.session_state.name, st.session_state.age, st.session_state.gender, st.session_state.height, st.session_state.weight, st.session_state.goal = profile
                         st.session_state.page = "dashboard"
                     else:
                         st.session_state.page = "profile_setup"
@@ -359,7 +360,7 @@ elif st.session_state.page == "verify_signup":
                 data = st.session_state.temp_signup
                 # Initial signup with default age/gender - will be updated in set up
                 # Added 170.0 as a default height to fix the argument count
-                ok = db.add_user( data["name"], 20, "Other", 170.0, data["email"], data["password"], "General Fitness")
+                ok = db.add_user(data["name"], 20, "Other", 170.0, 70.0, data["email"], data["password"], "General Fitness")
                 if ok:
                     save_email(data["email"])   # ✅ save email
 
