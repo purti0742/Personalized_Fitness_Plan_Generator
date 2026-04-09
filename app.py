@@ -173,6 +173,11 @@ h1, h2, h3 {
     font-weight: 700 !important;
 }
 
+/* This forces any text inside a 'glass-card' to be dark gray/black */
+.glass-card p, .glass-card li, .glass-card h1, .glass-card h2, .glass-card h3 {
+    color: #1a1a2e !important; 
+}
+
 </style>
 """, unsafe_allow_html=True)
 
