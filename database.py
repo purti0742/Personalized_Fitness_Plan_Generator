@@ -34,7 +34,7 @@ def check_password(password, hashed):
     return bcrypt.checkpw(password.encode('utf-8'), hashed)
 
 # ---------------- USER FUNCTIONS ----------------
-def add_user(name, age, gender, height, email, password, goal):
+def add_user(name, age, gender, height, weight, email, password, goal):
     # Check if user already exists
     if users_col.find_one({"email": email}):
         return False
@@ -44,7 +44,7 @@ def add_user(name, age, gender, height, email, password, goal):
         "age": age,
         "gender": gender,
         "height": height,
-        " weight":weight,
+        "weight": weight, # Fixed the space and added parameter
         "email": email,
         "password": hash_password(password),
         "goal": goal,
