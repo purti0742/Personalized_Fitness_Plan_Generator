@@ -173,14 +173,46 @@ h1, h2, h3 {
     font-weight: 700 !important;
 }
 
-/* Add this to your <style> block in app.py */
+/* Enhanced Workout Plan Container */
 .workout-plan-container {
-    background: rgba(0, 0, 0, 0.4) !important; /* Darker background */
+    background: rgba(255, 255, 255, 0.03) !important;
     backdrop-filter: blur(10px);
-    border-radius: 15px;
-    padding: 20px;
-    color: #ffffff !important; /* Forces text to stay white */
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 30px;
+    color: #e0e0e0 !important;
+    border: 1px solid rgba(255, 77, 77, 0.2);
+    line-height: 1.6;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+}
+
+/* Styling Markdown inside the plan */
+.workout-plan-container h1, .workout-plan-container h2 {
+    color: #FF4D4D !important;
+    border-bottom: 1px solid rgba(255, 77, 77, 0.3);
+    padding-bottom: 10px;
+    margin-top: 20px;
+}
+
+.workout-plan-container h3 {
+    color: #F9CB28 !important;
+    margin-top: 15px;
+}
+
+.workout-plan-container strong {
+    color: #FF4D4D !important;
+}
+
+.workout-plan-container ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.workout-plan-container li {
+    padding: 8px 15px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border-left: 3px solid #FF4D4D;
 }
 
 </style>
@@ -493,7 +525,11 @@ elif st.session_state.page == "dashboard":
                 st.session_state.last_plan = plan
                 db.save_workout(st.session_state.user_email, local_goal, plan)
                 st.success("Plan Generated Successfully!")
-                st.markdown(f'<div class="workout-plan-container">{plan}</div>', unsafe_allow_html=True)
+                st.markdown(f"""
+                <div class="workout-plan-container">
+                   {plan}
+                </div>
+                """, unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
     with tab3:
