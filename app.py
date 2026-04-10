@@ -175,7 +175,7 @@ h1, h2, h3 {
 
 /* Enhanced Workout Plan Container */
 .workout-plan-container {
-    background: rgba(255, 255, 255, 0.03) !important;
+    background:rgba(67, 97, 167, 0.84)!important;
     backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 30px;
