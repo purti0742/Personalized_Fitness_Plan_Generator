@@ -210,7 +210,7 @@ h1, h2, h3 {
 .workout-plan-container li {
     padding: 8px 15px;
     margin-bottom: 8px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(67, 97, 167, 0.84);
     border-radius: 8px;
     border-left: 3px solid #FF4D4D;
 }
