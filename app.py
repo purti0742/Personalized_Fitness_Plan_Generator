@@ -179,8 +179,8 @@ h1, h2, h3 {
     backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 30px;
-    color: #e0e0e0 !important;
-    border: 1px solid rgba(255, 77, 77, 0.2);
+    color: #2f4f4f !important;
+    border: 1px solid rgba(176, 120, 255, 1);
     line-height: 1.6;
     box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
 }
@@ -188,7 +188,7 @@ h1, h2, h3 {
 /* Styling Markdown inside the plan */
 .workout-plan-container h1, .workout-plan-container h2 {
     color: #FF4D4D !important;
-    border-bottom: 1px solid rgba(255, 77, 77, 0.3);
+    border-bottom: 1px solid rgba(176, 120, 255, 1);
     padding-bottom: 10px;
     margin-top: 20px;
 }
