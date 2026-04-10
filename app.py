@@ -173,9 +173,14 @@ h1, h2, h3 {
     font-weight: 700 !important;
 }
 
-/* This forces any text inside a 'glass-card' to be dark gray/black */
-.glass-card p, .glass-card li, .glass-card h1, .glass-card h2, .glass-card h3 {
-    color: #1a1a2e !important; 
+/* Add this to your <style> block in app.py */
+.workout-plan-container {
+    background: rgba(0, 0, 0, 0.4) !important; /* Darker background */
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 20px;
+    color: #ffffff !important; /* Forces text to stay white */
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 </style>
@@ -488,9 +493,7 @@ elif st.session_state.page == "dashboard":
                 st.session_state.last_plan = plan
                 db.save_workout(st.session_state.user_email, local_goal, plan)
                 st.success("Plan Generated Successfully!")
-                st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-                st.markdown(plan)
-                st.markdown('</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="workout-plan-container">{plan}</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
     with tab3:
