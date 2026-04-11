@@ -172,19 +172,6 @@ label, .stMarkdown, p, h1, h2, h3, span, [data-testid="stWidgetLabel"] p {
 h1, h2, h3 {
     font-weight: 700 !important;
 }
-
-/* Enhanced Workout Plan Container */
-.workout-plan-container {
-    background:rgba(67, 97, 167, 0.84)!important;
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 30px;
-    color: #2f4f4f !important;
-    border: 1px solid rgba(176, 120, 255, 1);
-    line-height: 1.6;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
-}
-
 /* Styling Markdown inside the plan */
 .workout-plan-container {
     color: #FF4D4D !important;
@@ -193,18 +180,6 @@ h1, h2, h3 {
     margin-top: 20px;
 }
 
-.workout-plan-container ul {
-    list-style-type: none;
-    padding-left: 0;
-}
-
-.workout-plan-container li {
-    padding: 8px 15px;
-    margin-bottom: 8px;
-    background: rgba(67, 97, 167, 0.84);
-    border-radius: 8px;
-    border-left: 3px solid #FF4D4D;
-}
 
 </style>
 """, unsafe_allow_html=True)
