@@ -176,6 +176,7 @@ h1, h2, h3 {
 .workout-plan-container {
     color: #FF4D4D !important;
     border-bottom: 1px solid rgba(176, 120, 255, 1);
+    background: rgba(67, 97, 167, 0.84)!important;
     padding-bottom: 10px;
     margin-top: 20px;
 }
