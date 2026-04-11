@@ -186,20 +186,11 @@ h1, h2, h3 {
 }
 
 /* Styling Markdown inside the plan */
-.workout-plan-container h1, .workout-plan-container h2 {
+.workout-plan-container {
     color: #FF4D4D !important;
     border-bottom: 1px solid rgba(176, 120, 255, 1);
     padding-bottom: 10px;
     margin-top: 20px;
-}
-
-.workout-plan-container h3 {
-    color: #F9CB28 !important;
-    margin-top: 15px;
-}
-
-.workout-plan-container strong {
-    color: #FF4D4D !important;
 }
 
 .workout-plan-container ul {
