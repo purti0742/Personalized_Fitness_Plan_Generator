@@ -37,7 +37,7 @@ st.markdown("""
 
 /* Glassmorphism containers */
 .glass-card {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(43, 124, 222, 0.71);
     backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 24px;
@@ -110,7 +110,7 @@ div[data-testid="stTickBar"] span {
 
 /* Tabs */
 .stTabs [data-baseweb="tab-list"] {
-    background-color: rgba(255, 255, 255, 0.05) !important;
+    background-color: rgba(43, 124, 222, 0.71) !important;
     border-radius: 12px !important;
     padding: 5px !important;
 }
@@ -134,7 +134,7 @@ label, .stMarkdown, p, h1, h2, h3, span, [data-testid="stWidgetLabel"] p {
 
 /* Card Styling */
 .glass-card {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(43, 124, 222, 0.71);
     backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 24px;
