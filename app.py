@@ -174,11 +174,33 @@ h1, h2, h3 {
 }
 /* Styling Markdown inside the plan */
 .workout-plan-container {
-    color: #FF4D4D !important;
-    border-bottom: 1px solid rgba(176, 120, 255, 1);
-    background: rgba(67, 97, 167, 0.84)!important;
+    background: rgba(15, 23, 42, 0.6) !important;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    color: #f8fafc !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+.workout-plan-container h1, .workout-plan-container h2, .workout-plan-container h3, .workout-plan-container h4 {
+    color: #F9CB28 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding-bottom: 10px;
     margin-top: 20px;
+    margin-bottom: 15px;
+    font-weight: 700 !important;
+}
+.workout-plan-container strong {
+    color: #FF4D4D !important;
+}
+.workout-plan-container ul, .workout-plan-container ol {
+    margin-left: 20px;
+    line-height: 1.8;
+}
+.workout-plan-container li {
+    margin-bottom: 8px;
 }
 
 
