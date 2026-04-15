@@ -24,15 +24,16 @@ def generate_workout(name, age, goal, level, equipment, bmi):
         "messages": [
             {
                 "role": "system", 
-                "content": "You are a professional fitness coach. Return ONLY a 5-day workout plan in Markdown format. Do not include introductory text."
+                "content": "You are a fitness coach. Return ONLY a short 5-day workout plan in bullet points. No explanation. Keep it concise."
             },
             {
                 "role": "user", 
-                "content": f"Name: {name}, Age: {age}, Goal: {goal}, Level: {level}, Equipment: {equipment}, BMI: {bmi}. Provide 3-4 exercises per day with sets and reps."
+                "content": f"Name: {name}, Age: {age}, Goal: {goal}, Level: {level}, Equipment: {equipment}, BMI: {bmi}. Provide ONLY 3 exercises per day"
             }
         ],
-        "max_tokens": 1000,
-        "temperature": 0.7
+        "max_tokens": 300,
+        "temperature": 0.5,
+        "stop": ["\n\n\n"]
     }
 
     try:
