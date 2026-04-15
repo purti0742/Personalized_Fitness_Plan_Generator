@@ -31,7 +31,7 @@ def generate_workout(name, age, goal, level, equipment, bmi):
                 "content": f"Age: {age}, Goal: {goal}, Level: {level}, Equipment: {equipment}. Provide 3 exercises per day with sets and reps. Add a short title for each day (e.g., Upper Body, Cardio)."
             }
         ],
-        "max_tokens": 300,
+        "max_tokens": 350,
         "temperature": 0.5,
         "stop": ["\n\n\n"]
     }
