@@ -24,7 +24,7 @@ def generate_workout(name, age, goal, level, equipment, bmi):
         "messages": [
             {
                 "role": "system", 
-                "content": "You are a fitness coach. Generate a 5-day workout plan in Markdown format. Each day must include exactly 3 exercises with sets and reps. Keep it concise."
+                "content": "You are a fitness coach. Generate a 5-day workout plan. Each day must include exactly 3 exercises with sets and reps. Keep it concise."
             },
             {
                 "role": "user", 
