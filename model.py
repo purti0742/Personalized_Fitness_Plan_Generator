@@ -10,7 +10,7 @@ def generate_workout(name, age, goal, level, equipment, bmi):
 
     try:
         completion = client.chat.completions.create(
-            model="llama3-8b-8192", # Or whichever Llama model you prefer
+            model="llama-3.3-70b-versatile",
             messages=[
                 {
                     "role": "system",
