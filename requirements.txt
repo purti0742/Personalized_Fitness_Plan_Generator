@@ -9,4 +9,4 @@ requests
 dnspython
 pymongo[srv]
 certifi
-
+openai
