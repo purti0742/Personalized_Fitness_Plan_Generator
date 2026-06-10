@@ -33,6 +33,7 @@ Create a `.env` file in the root directory and add your credentials:
 MONGODB_URI=your_mongodb_connection_string
 GROQ_API_KEY=your_groq_api_key
 SECRET_KEY=your_secret_key_for_jwt
+BREVO_API_KEY=your_secret_key_of_brevo
 
 
 4. **Run the application:**
